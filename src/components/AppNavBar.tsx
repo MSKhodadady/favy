@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  AlertContext,
-  alertTypeClassName,
-} from "@/src/components/AlertProvider";
+// import { AlertContext } from "@/src/components/AlertProvider";
 import {
   LoginDispatchContext,
   LoginStateContext,
@@ -16,7 +13,7 @@ export function AppNavBar() {
   const loginState = useContext(LoginStateContext);
   const loginDispatch = useContext(LoginDispatchContext);
 
-  const alertProvider = useContext(AlertContext);
+  // const alertProvider = useContext(AlertContext);
 
   const logOut = () => {
     loginDispatch!({ type: "logout" });
@@ -76,17 +73,6 @@ export function AppNavBar() {
           </>
         )}
       </ul>
-      {alertProvider.alertState.show && (
-        <div
-          className={
-            "alert z-10 left-6 bottom-6 w-fit fixed" +
-            " " +
-            alertTypeClassName(alertProvider.alertState.type)
-          }
-        >
-          <p>{alertProvider.alertState.text}</p>
-        </div>
-      )}
     </nav>
   );
 }

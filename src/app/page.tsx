@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import AppLogo from "@/public/favy-logo.svg";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
   const [showSearch, setShowSearch] = useState(false);
@@ -10,7 +11,12 @@ export default function HomePage() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="bg-primary pt-3 min-h-lvh overflow-hidden flex flex-col items-center">
+    <div
+      className=" pt-3 min-h-lvh overflow-hidden flex flex-col items-center"
+      style={{
+        background: "linear-gradient(134.68deg, #D76161 0.56%, #A70000 100%)",
+      }}
+    >
       <div
         className="rounded-2xl bg-white flex flex-col text-center py-10 items-center"
         style={{ width: "102%" }}
@@ -23,9 +29,14 @@ export default function HomePage() {
       </div>
 
       <div className="text-white text-lg mt-3 text-center py-5 space-y-2 p-2 w-full">
-        <button type="button" className="btn btn-outline  w-full rounded-full">
-          همین الان علایقت رو وارد کن!
-        </button>
+        <Link href={"/sign-in"}>
+          <button
+            type="button"
+            className="btn btn-outline  w-full rounded-full"
+          >
+            همین الان علایقت رو وارد کن!
+          </button>
+        </Link>
         <div>یا</div>
         {!showSearch ? (
           <button
