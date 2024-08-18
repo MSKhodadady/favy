@@ -1,37 +1,44 @@
 "use server";
 
-import { getUser } from "@/src/api/user";
-import { redirect } from "next/navigation";
+import { userApi } from "@/src/api/user";
+import { AUTH_COOKIE_KEY, USERNAME_COOKIE_KEY } from "@/src/lib/constants";
+import { setCookieFromServer } from "@/src/lib/server/cookieManager";
+import { hasErrorWithCode } from "@/src/lib/utils";
 
-const phoneNumVerified = (phoneNum: string) =>
-  typeof phoneNum == "string" && /09[0-9]{9}/.test(phoneNum);
+export async function loginAct(email: string, password: string) {
+  try {
+    const user = await userApi.findUserByEmail(email, [
+      "username",
+      "email_verified",
+    ]);
 
-export async function phoneSendAct(phoneNum: string) {
-  if (!phoneNumVerified) return;
+    if (user == null) return { mode: "not-correct" };
 
-  getRand(phoneNum);
-}
+    if (!user.email_verified) return { mode: "email-not-verified" };
 
-export async function randVerify(
-  phonNum: string,
-  randObj: RandObj,
-  rand: string
-) {
-  if (!phoneNumVerified) return;
-  if (
-    typeof randObj.objHash != "string" ||
-    typeof randObj.objStr != "string" ||
-    typeof rand != "string"
-  )
-    return;
+    const loginData = await userApi.loginEmail(email, password);
 
-  const randVerified = verifyRand(rand, randObj);
+    setCookieFromServer(
+      AUTH_COOKIE_KEY,
+      loginData.access_token ?? "",
+      new Date(Date.now() + (loginData.expires ?? 900000))
+    );
 
-  if (randVerified != "correct") return randVerified;
+    setCookieFromServer(
+      USERNAME_COOKIE_KEY,
+      user.username,
+      new Date(Date.now() + (loginData.expires ?? 900000))
+    );
 
-  const user = getUser(phonNum);
+    return { mode: "success", username: user.username };
+  } catch (error) {
+    if (hasErrorWithCode(error, "INVALID_CREDENTIALS")) {
+      return { mode: "not-correct" };
+    }
 
-  if (!user) redirect("/register");
-  else {
+    console.error("[/sign-in]");
+    console.error(error);
+
+    return { mode: "server-error" };
   }
 }

@@ -1,26 +1,33 @@
 "use client";
 
 import { ReactNode } from "react";
-import { AlertType } from "../redux/slices/alert";
-import { useAppSelector } from "../redux/store";
+import { AlertType } from "../lib/client/redux/slices/alert";
+import { useAppSelector } from "../lib/client/redux/store";
+import { Provider } from "react-redux";
+import { store } from "../lib/client/redux/store";
 
-export function AlertViewer() {
-  const s = useAppSelector((s) => s.alert);
-
+export function AppWrapper({ children }: { children: ReactNode }) {
   return (
-    <>
-      {s.show && (
-        <div
-          className={
-            "alert z-10 left-6 bottom-6 w-fit fixed" +
-            " " +
-            alertTypeClassName(s.type)
-          }
-        >
-          <p>{s.text}</p>
-        </div>
-      )}
-    </>
+    <Provider store={store}>
+      <AlertViewer />
+      {children}
+    </Provider>
+  );
+}
+
+function AlertViewer() {
+  const s = useAppSelector((s) => s.alert);
+  return (
+    s.show && (
+      <div
+        className={`alert z-10 right-0 bottom-0 w-fit fixed m-5 
+          flex 
+          ${alertTypeClassName(s.type)}`}
+      >
+        &#9432;
+        <p>{s.text}</p>
+      </div>
+    )
   );
 }
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { createSlice } from "@reduxjs/toolkit";
 
 export type AlertType = "info" | "success" | "warning" | "error";

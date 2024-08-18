@@ -26,20 +26,14 @@ const transporter = createTransport(transportObj);
  */
 export async function sendRegistrationMail(email, link) {
   const emailText = `
-  <h1>Welcome to Favy</h1>
-  <a href="${link}" target="_blank">Click on this link to verify</a>
+<h1>Welcome to Favy</h1>
+<a href="${link}" target="_blank">Click on this link to verify</a>
 `;
 
-  try {
-    const res = await transporter.sendMail({
-      from: MAIL_SENDER,
-      to: email,
-      subject: "Favy Registration",
-      html: emailText,
-    });
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
+  await transporter.sendMail({
+    from: MAIL_SENDER,
+    to: email,
+    subject: "Favy Registration",
+    html: emailText,
+  });
 }
