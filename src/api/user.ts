@@ -2,13 +2,18 @@ import {
   createUser as dCreateUser,
   login,
   readUsers,
+  updateMe,
   updateUser,
+  withToken,
 } from "@directus/sdk";
-import {
-  directusClient,
-  directusServerClient,
-} from "../lib/server/directusClient";
 import { RegisterInput } from "../app/(sign)/sign-up/page";
+import { getAuthCookie } from "../lib/server/cookieManager";
+import {
+  directusPublicClient,
+  directusServerClient,
+  directusUserClient,
+} from "../lib/server/directusClient";
+import { getUserDescLimit } from "../lib/server/envGetter";
 
 export const userApi = {
   async createUser(ri: RegisterInput) {
@@ -21,6 +26,7 @@ export const userApi = {
       })
     );
   },
+
   async findUserByEmail(email: string, fields = ["*"]) {
     const users = await directusServerClient.request(
       readUsers({
@@ -32,6 +38,7 @@ export const userApi = {
     );
     return users.length == 0 ? null : users[0];
   },
+
   async setVerified(email: string) {
     const user = await this.findUserByEmail(email);
 
@@ -46,6 +53,35 @@ export const userApi = {
   },
 
   async loginEmail(email: string, password: string) {
-    return directusClient.request(login(email, password));
+    return directusUserClient.request(login(email, password));
+  },
+
+  async findUserByUsername(username: string, fields = ["username"]) {
+    const users = await directusPublicClient.request(
+      readUsers({
+        fields,
+        filter: {
+          username,
+        },
+      })
+    );
+    return users.length == 0 ? null : users[0];
+  },
+
+  async changeUserDesc(description: string) {
+    const authCookie = getAuthCookie();
+
+    if (description.length > getUserDescLimit()) {
+      throw Error("LONG-DESC");
+    }
+
+    await directusUserClient.request(
+      withToken(
+        authCookie,
+        updateMe({
+          description,
+        })
+      )
+    );
   },
 };

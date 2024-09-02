@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { AUTH_COOKIE_KEY, USERNAME_COOKIE_KEY } from "../constants";
 
 export function setCookieFromServer(
   name: string,
@@ -12,4 +13,12 @@ export function setCookieFromServer(
     expires,
     path,
   });
+}
+
+export function getAuthCookie() {
+  return cookies().get(AUTH_COOKIE_KEY)?.value ?? "";
+}
+
+export function getUsernameCookie() {
+  return cookies().get(USERNAME_COOKIE_KEY)?.value ?? "";
 }

@@ -1,10 +1,11 @@
 import { createTransport } from "nodemailer";
-
-const MAIL_HOST = process.env.MAIL_HOST;
-const MAIL_PORT = process.env.MAIL_PORT;
-const MAIL_USERNAME = process.env.MAIL_USERNAME;
-const MAIL_PASSWORD = process.env.MAIL_PASSWORD;
-const MAIL_SENDER = process.env.MAIL_SENDER;
+import {
+  MAIL_HOST,
+  MAIL_PASSWORD,
+  MAIL_PORT,
+  MAIL_SENDER,
+  MAIL_USERNAME,
+} from "./envGetter";
 
 const transportObj = {
   host: MAIL_HOST,

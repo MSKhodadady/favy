@@ -3,11 +3,11 @@
 import { TextInput } from "@/src/components/TextInput";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
 import { useShowAlert } from "@/src/lib/client/hooks/useShowAlert";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { SignLayout } from "../SignLayout";
 import { loginAct } from "./actions";
-import Link from "next/link";
 
 export default function LoginPage() {
   type Inputs = {
@@ -69,7 +69,7 @@ export default function LoginPage() {
               pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
             }),
           }}
-          inputType="email"
+          // inputType=""
           placeHolder="ایمیل"
           hasErr={errors.email != undefined}
           error={
