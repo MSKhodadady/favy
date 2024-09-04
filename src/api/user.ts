@@ -1,9 +1,12 @@
 import {
   createUser as dCreateUser,
+  deleteFile,
   login,
+  readMe,
   readUsers,
   updateMe,
   updateUser,
+  uploadFiles,
   withToken,
 } from "@directus/sdk";
 import { RegisterInput } from "../app/(sign)/sign-up/page";
@@ -71,6 +74,8 @@ export const userApi = {
   async changeUserDesc(description: string) {
     const authCookie = getAuthCookie();
 
+    if (authCookie == undefined) return;
+
     if (description.length > getUserDescLimit()) {
       throw Error("LONG-DESC");
     }
@@ -82,6 +87,37 @@ export const userApi = {
           description,
         })
       )
+    );
+  },
+
+  async changeAvatar(avatarFile: File) {
+    const authCookie = getAuthCookie();
+
+    if (authCookie == undefined) return;
+
+    const currentUser = await directusUserClient.request(
+      withToken(authCookie, readMe({ fields: ["avatar"] }))
+    );
+
+    if (!currentUser) throw Error("no-such-user");
+
+    //: delete previous avatar file if exists
+    const { avatar } = currentUser;
+    if (avatar != null) {
+      await directusUserClient.request(
+        withToken(authCookie, updateMe({ avatar: null }))
+      );
+      await directusServerClient.request(deleteFile(avatar));
+    }
+
+    //:
+    const fd = new FormData();
+    fd.append("file", avatarFile);
+    const f = await directusServerClient.request(uploadFiles(fd));
+
+    //:
+    await directusUserClient.request(
+      withToken(authCookie, updateMe({ avatar: f.id }))
     );
   },
 };

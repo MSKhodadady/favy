@@ -1,12 +1,12 @@
 "use client";
 
 import { TextInput } from "@/src/components/TextInput";
+import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
 import { emailErrorText, emailPattern } from "@/src/lib/utils";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { SignLayout } from "../../SignLayout";
 import { sendLinkAgainAct } from "./action";
-import { useShowAlert } from "@/src/lib/client/hooks/useShowAlert";
-import { useRouter } from "next/navigation";
 
 export default function SendAgainVerificationLinkPage() {
   const {
@@ -15,7 +15,7 @@ export default function SendAgainVerificationLinkPage() {
     formState: { errors },
     setError,
   } = useForm<{ email: string }>();
-  const { showAlert } = useShowAlert();
+  const { showAlertTimeout } = useShowAlertTimeout();
   const router = useRouter();
   return (
     <SignLayout title="ارسال دوباره ایمیل تایید">
@@ -25,11 +25,11 @@ export default function SendAgainVerificationLinkPage() {
 
           switch (res) {
             case "server-error":
-              showAlert("خطای سرور", "warning");
+              showAlertTimeout("خطای سرور", "warning");
               break;
 
             case "user-not-found":
-              showAlert("کاربری با این ایمیل ثبت نام نکرده است.");
+              showAlertTimeout("کاربری با این ایمیل ثبت نام نکرده است.");
               break;
 
             case "success":

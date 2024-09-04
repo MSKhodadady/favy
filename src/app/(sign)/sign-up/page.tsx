@@ -1,20 +1,19 @@
 "use client";
 
+import { TextInput } from "@/src/components/TextInput";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
-import { useShowAlert } from "@/src/lib/client/hooks/useShowAlert";
+import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
+import {
+  emailErrorText,
+  emailPattern,
+  matchCase,
+  passwordPattern,
+} from "@/src/lib/utils";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { SignLayout } from "../SignLayout";
 import { registerAct } from "./action";
-import { TextInput } from "@/src/components/TextInput";
-import {
-  passwordPattern,
-  matchCase,
-  emailPattern,
-  emailErrorText,
-} from "@/src/lib/utils";
-import { useRouter } from "next/navigation";
 
 export type RegisterInput = {
   username: string;
@@ -30,7 +29,7 @@ export default function SignPage() {
     formState: { errors },
     setError,
   } = useForm<RegisterInput>();
-  const { showAlert } = useShowAlert();
+  const { showAlertTimeout } = useShowAlertTimeout();
   const { loading, withLoading } = useLoading();
   const router = useRouter();
 
@@ -51,11 +50,11 @@ export default function SignPage() {
           break;
 
         case "server-error":
-          showAlert("خطای سرور", "warning");
+          showAlertTimeout("خطای سرور", "warning");
           break;
 
         case "user-exist":
-          showAlert("کاربر با این ایمیل یا نام کاربری وجود دارد.");
+          showAlertTimeout("کاربر با این ایمیل یا نام کاربری وجود دارد.");
 
         default:
           break;

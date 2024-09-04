@@ -2,7 +2,7 @@
 
 import { TextInput } from "@/src/components/TextInput";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
-import { useShowAlert } from "@/src/lib/client/hooks/useShowAlert";
+import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -21,7 +21,7 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const { showAlert } = useShowAlert();
+  const { showAlertTimeout } = useShowAlertTimeout();
   const router = useRouter();
   const { loading, withLoading } = useLoading();
 
@@ -33,20 +33,20 @@ export default function LoginPage() {
 
       switch (mode) {
         case "not-correct":
-          showAlert("ایمیل یا پسورد اشتباه است.");
+          showAlertTimeout("ایمیل یا پسورد اشتباه است.");
           break;
 
         case "email-not-verified":
-          showAlert("ایمیل شما هنوز تایید نشده است.");
+          showAlertTimeout("ایمیل شما هنوز تایید نشده است.");
           break;
 
         case "server-error":
-          showAlert("خطای سرور", "warning");
+          showAlertTimeout("خطای سرور", "warning");
 
           break;
 
         case "success":
-          showAlert("با موفقیت وارد شدید.", "success");
+          showAlertTimeout("با موفقیت وارد شدید.", "success");
           router.push(`/u/${res.username}`);
 
         default:

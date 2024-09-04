@@ -8,6 +8,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignLayout } from "../../(sign)/SignLayout";
+import { AvatarPlaceHolder, AvatarViewer } from "./AvatarViewer";
+import { ChangeAvatarModal } from "./ChangeAvatarModal";
 import { ChangeDescModal } from "./ChangeDescModal";
 import { SignOutBtn } from "./SignOutBtn";
 
@@ -29,6 +31,7 @@ export default async function UserPage({
     "description",
     "username",
     "fav_movie.Movie_id",
+    "avatar",
   ]);
 
   if (serverUser == null) return <SignLayout title="چنین کاربری وجود ندارد!" />;
@@ -44,8 +47,6 @@ export default async function UserPage({
   const authToken = cookiesStore.get(AUTH_COOKIE_KEY)?.value;
 
   const isLoggedIn = authToken != undefined && username == usernameCookie;
-
-  // const user = directusServerClient.request()
 
   return (
     <div className="bg-primary">
@@ -64,7 +65,24 @@ export default async function UserPage({
 
         <div className="flex flex-col justify-center pt-10 items-center gap-2">
           {/* AVATAR */}
-          <div className="bg-primary rounded-full w-28 h-28" />
+          {isLoggedIn ? (
+            <ChangeAvatarModal
+              avatarId={serverUser.avatar}
+              avatarLink={
+                serverUser.avatar
+                  ? getDirectusFileLink(serverUser.avatar)
+                  : null
+              }
+              username={username}
+            />
+          ) : serverUser.avatar ? (
+            <AvatarViewer
+              avatarLink={getDirectusFileLink(serverUser.avatar)}
+              username={username}
+            />
+          ) : (
+            <AvatarPlaceHolder />
+          )}
 
           <div className="text-xl font-bold">{serverUser.username}</div>
           {isLoggedIn ? (

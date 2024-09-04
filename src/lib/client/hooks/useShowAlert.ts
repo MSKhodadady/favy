@@ -7,12 +7,12 @@ import {
 } from "@/src/lib/client/redux/slices/alert";
 import { useAppDispatch, useAppSelector } from "@/src/lib/client/redux/store";
 
-export function useShowAlert() {
+export function useShowAlertTimeout() {
   const s = useAppSelector((s) => s.alert);
 
   const dispatch = useAppDispatch();
 
-  function showAlert(
+  function showAlertTimeout(
     text: string,
     type: AlertType = "error",
     expireTime = 2000
@@ -24,5 +24,5 @@ export function useShowAlert() {
     }, expireTime);
   }
 
-  return { showAlert };
+  return { showAlertTimeout };
 }

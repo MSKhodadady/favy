@@ -1,12 +1,12 @@
 "use client";
 
-import { useShowAlert } from "@/src/lib/client/hooks/useShowAlert";
+import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
 import { useEffect, useState } from "react";
 import { changeUserDescAct } from "./action";
 
 export function ChangeDescModal(P: { username: string; desc: string }) {
   const [description, setDescription] = useState(P.desc);
-  const { showAlert } = useShowAlert();
+  const { showAlertTimeout } = useShowAlertTimeout();
 
   useEffect(() => {
     setDescription(P.desc);
@@ -57,10 +57,10 @@ export function ChangeDescModal(P: { username: string; desc: string }) {
 
                 switch (res) {
                   case "long-desc":
-                    showAlert("متن طولانی است.");
+                    showAlertTimeout("متن طولانی است.");
                     break;
                   case "internal-error":
-                    showAlert("خطای سرور", "warning");
+                    showAlertTimeout("خطای سرور", "warning");
                     break;
                   case "success":
                     //: close modal

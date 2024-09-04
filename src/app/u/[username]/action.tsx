@@ -30,3 +30,20 @@ export async function changeUserDescAct(description: string) {
     }
   }
 }
+
+export async function changeUserAvatarAct(fd: FormData) {
+  const avatarFile = fd.get("avatar-img");
+
+  if (avatarFile == null || typeof avatarFile == "string") return "bad-req";
+
+  try {
+    await userApi.changeAvatar(avatarFile);
+
+    revalidatePath(`/u/${getUsernameCookie()}`);
+
+    return "success";
+  } catch (error) {
+    console.log(error);
+    return "internal-error";
+  }
+}
