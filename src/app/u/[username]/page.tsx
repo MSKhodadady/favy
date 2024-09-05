@@ -91,7 +91,7 @@ export default async function UserPage({
               desc={serverUser.description}
             />
           ) : (
-            <div className="w-full px-3 my-3">
+            <div className="w-full px-3 my-3 whitespace-pre-wrap">
               {serverUser.description ?? ""}
             </div>
           )}
