@@ -84,7 +84,7 @@ export const userApi = {
       withToken(
         authCookie,
         updateMe({
-          description,
+          description: description.trim(),
         })
       )
     );
@@ -119,5 +119,23 @@ export const userApi = {
     await directusUserClient.request(
       withToken(authCookie, updateMe({ avatar: f.id }))
     );
+  },
+
+  async deleteAvatar() {
+    const authCookie = getAuthCookie();
+    if (authCookie == undefined) return;
+
+    const currentUser = await directusUserClient.request(
+      withToken(authCookie, readMe({ fields: ["avatar"] }))
+    );
+    if (!currentUser) throw Error("no-such-user");
+
+    const { avatar } = currentUser;
+    if (avatar != null) {
+      await directusUserClient.request(
+        withToken(authCookie, updateMe({ avatar: null }))
+      );
+      await directusServerClient.request(deleteFile(avatar));
+    }
   },
 };

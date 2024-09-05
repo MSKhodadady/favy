@@ -7,14 +7,18 @@ export function AvatarViewer(P: {
   changeMode?: boolean;
 }) {
   return (
-    <div className={`mask mask-squircle ${P.changeMode ? "w-36" : "w-28"}`}>
-      <Image
-        src={P.avatarLink}
-        alt={P.changeMode ? "change avatar" : `avatar of ${P.username}`}
-        width={100}
-        height={100}
-        className={` object-cover ${P.changeMode ? "w-36 h-36" : "w-28 h-28"}`}
-      />
+    <div className="avatar">
+      <div className={`mask mask-squircle  ${P.changeMode ? "w-36" : "w-28"}`}>
+        <Image
+          src={P.avatarLink}
+          alt={P.changeMode ? "change avatar" : `avatar of ${P.username}`}
+          width={100}
+          height={100}
+          className={` object-cover ${
+            P.changeMode ? "w-36 h-36" : "w-28 h-28"
+          }`}
+        />
+      </div>
     </div>
   );
 }

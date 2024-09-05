@@ -47,3 +47,15 @@ export async function changeUserAvatarAct(fd: FormData) {
     return "internal-error";
   }
 }
+
+export async function deleteUserAvatarAct() {
+  try {
+    await userApi.deleteAvatar();
+    revalidatePath(`/u/${getUsernameCookie()}`);
+
+    return "success";
+  } catch (error) {
+    console.log(error);
+    return "internal-error";
+  }
+}

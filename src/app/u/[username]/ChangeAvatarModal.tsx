@@ -2,10 +2,14 @@
 
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
 import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
-import { faPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPen,
+  faTrashCan,
+  faUserPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChangeEvent, useRef, useState } from "react";
-import { changeUserAvatarAct } from "./action";
+import { changeUserAvatarAct, deleteUserAvatarAct } from "./action";
 import { AvatarPlaceHolder, AvatarViewer } from "./AvatarViewer";
 
 export function ChangeAvatarModal(P: {
@@ -17,7 +21,9 @@ export function ChangeAvatarModal(P: {
   const { withLoading, loading } = useLoading();
 
   const inputFileRef = useRef<null | HTMLInputElement>(null);
-  const dialogRef = useRef<null | HTMLDialogElement>(null);
+  const dialogChangeRef = useRef<null | HTMLDialogElement>(null);
+  const dialogDeleteRef = useRef<null | HTMLDialogElement>(null);
+
   const [inputAvatarImg, setInputAvatarImg] = useState(null as null | File);
 
   function onInputFile(e: ChangeEvent<HTMLInputElement>) {
@@ -27,7 +33,7 @@ export function ChangeAvatarModal(P: {
       const f = files[0];
       setInputAvatarImg(f);
 
-      dialogRef.current?.showModal();
+      dialogChangeRef.current?.showModal();
     }
   }
 
@@ -43,10 +49,27 @@ export function ChangeAvatarModal(P: {
 
       switch (res) {
         case "success":
-          dialogRef.current?.close();
+          dialogChangeRef.current?.close();
           break;
 
         case "bad-req":
+        case "internal-error":
+          showAlertTimeout("خطای سرور", "warning");
+          break;
+
+        default:
+          break;
+      }
+    });
+  }
+
+  function onDeleteAvatar() {
+    withLoading(async () => {
+      const res = await deleteUserAvatarAct();
+      switch (res) {
+        case "success":
+          dialogDeleteRef.current?.close();
+          break;
         case "internal-error":
           showAlertTimeout("خطای سرور", "warning");
           break;
@@ -63,10 +86,11 @@ export function ChangeAvatarModal(P: {
         {P.avatarLink ? (
           <>
             <AvatarViewer avatarLink={P.avatarLink} username={P.username} />
+            {/* CHANGE AVATAR */}
             <button
               type="button"
               className="btn btn-ghost btn-circle
-            bg-white
+            bg-white hover:bg-white active:bg-white shadow-lg
               w-7 h-7 min-h-fit m-1 
               absolute bottom-0 left-0"
               onClick={() => {
@@ -75,9 +99,27 @@ export function ChangeAvatarModal(P: {
             >
               <FontAwesomeIcon icon={faPen} className="w-3 h-3" color="black" />
             </button>
+            {/* DELETE AVATAR */}
+            <button
+              type="button"
+              className="btn btn-ghost btn-circle
+            bg-white hover:bg-white active:bg-white shadow-lg
+              w-7 h-7 min-h-fit m-1 
+              absolute bottom-0 right-0"
+              onClick={() => {
+                dialogDeleteRef.current?.showModal();
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faTrashCan}
+                className="w-3 h-3"
+                color="black"
+              />
+            </button>
           </>
         ) : (
           <AvatarPlaceHolder>
+            {/* ADD AVATAR */}
             <button
               type="button"
               className="btn btn-ghost"
@@ -104,7 +146,12 @@ export function ChangeAvatarModal(P: {
         />
       </div>
 
-      <dialog ref={dialogRef} id="change_user_avatar_modal" className="modal">
+      {/* CONFIRM CHANGE MODAL */}
+      <dialog
+        ref={dialogChangeRef}
+        id="change_user_avatar_modal"
+        className="modal"
+      >
         <div className="modal-box">
           <div className="w-full flex justify-center items-center">
             {inputAvatarImg && (
@@ -130,7 +177,7 @@ export function ChangeAvatarModal(P: {
             </button>
           </div>
         </div>
-
+        {/* BACKDROP WITH CLOSE */}
         <form method="dialog" className="modal-backdrop">
           <button
             type="submit"
@@ -143,6 +190,31 @@ export function ChangeAvatarModal(P: {
           >
             close
           </button>
+        </form>
+      </dialog>
+
+      <dialog ref={dialogDeleteRef} className="modal">
+        <div className="modal-box">
+          <h1>آیا مطمئن هستید؟</h1>
+
+          <div className="modal-action">
+            <button
+              type="button"
+              className="btn btn-primary w-full"
+              disabled={loading}
+              onClick={onDeleteAvatar}
+            >
+              {loading ? (
+                <progress className="progress progress-success w-full"></progress>
+              ) : (
+                "ثبت"
+              )}
+            </button>
+          </div>
+        </div>
+        {/* BACKDROP WITH CLOSE */}
+        <form method="dialog" className="modal-backdrop">
+          <button type="submit">close</button>
         </form>
       </dialog>
     </>
