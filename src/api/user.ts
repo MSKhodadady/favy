@@ -1,4 +1,5 @@
 import {
+  createItem,
   createUser as dCreateUser,
   deleteFile,
   login,
@@ -71,6 +72,19 @@ export const userApi = {
     return users.length == 0 ? null : users[0];
   },
 
+  //: for logged in users {
+  async getCurrentUser(fields: string[]) {
+    const authCookie = getAuthCookie();
+    if (authCookie == undefined) throw Error("no-such-user");
+
+    const currentUser = await directusUserClient.request(
+      withToken(authCookie, readMe({ fields }))
+    );
+    if (!currentUser) throw Error("no-such-user");
+
+    return { currentUser, authCookie };
+  },
+
   async changeUserDesc(description: string) {
     const authCookie = getAuthCookie();
 
@@ -122,13 +136,7 @@ export const userApi = {
   },
 
   async deleteAvatar() {
-    const authCookie = getAuthCookie();
-    if (authCookie == undefined) return;
-
-    const currentUser = await directusUserClient.request(
-      withToken(authCookie, readMe({ fields: ["avatar"] }))
-    );
-    if (!currentUser) throw Error("no-such-user");
+    const { currentUser, authCookie } = await this.getCurrentUser(["avatar"]);
 
     const { avatar } = currentUser;
     if (avatar != null) {
@@ -138,4 +146,19 @@ export const userApi = {
       await directusServerClient.request(deleteFile(avatar));
     }
   },
+
+  async addMovie(movieId: string) {
+    const { currentUser, authCookie } = await this.getCurrentUser(["id"]);
+
+    const r = await directusUserClient.request(
+      withToken(
+        authCookie,
+        createItem("MovieFav", {
+          Movie_id: movieId,
+          user_id: currentUser.id,
+        })
+      )
+    );
+  },
+  //: }
 };

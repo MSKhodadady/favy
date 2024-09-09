@@ -1,13 +1,14 @@
 "use client";
 
-import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
+import { useActionResChecker } from "@/src/lib/client/hooks/useActionResChecker";
 import { USER_DESC_LINE_COUNT } from "@/src/lib/constants";
 import { useEffect, useState } from "react";
 import { changeUserDescAct } from "./action";
 
 export function ChangeDescModal(P: { username: string; desc: string }) {
   const [description, setDescription] = useState(P.desc);
-  const { showAlertTimeout } = useShowAlertTimeout();
+
+  const actionChecker = useActionResChecker();
 
   useEffect(() => {
     setDescription(P.desc);
@@ -20,22 +21,25 @@ export function ChangeDescModal(P: { username: string; desc: string }) {
   }
 
   async function onSubmit() {
-    const res = await changeUserDescAct(description);
-
-    switch (res) {
-      case "long-desc":
-        showAlertTimeout("متن طولانی است.");
-        break;
-      case "internal-error":
-        showAlertTimeout("خطای سرور", "warning");
-        break;
-      case "success":
+    actionChecker({
+      res: await changeUserDescAct(description),
+      onOther(r, alertShower, router) {
+        switch (r) {
+          case "long-desc":
+            alertShower.showAlertTimeout("متن طولانی است.");
+            break;
+          default:
+            alertShower.showInternalErr();
+        }
+      },
+      onSuccess() {
         setDescription(description.trim());
         //: close modal
         (
           document.getElementById("change_user_desc_modal") as HTMLDialogElement
         ).close();
-    }
+      },
+    });
   }
 
   return (
@@ -77,14 +81,21 @@ export function ChangeDescModal(P: { username: string; desc: string }) {
             }}
           />
 
-          <div className="modal-action">
+          <div className="modal-action gap-1">
             <button className="btn btn-primary w-full" onClick={onSubmit}>
               ثبت
             </button>
           </div>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button type="submit">close</button>
+          <button
+            type="submit"
+            onClick={() => {
+              setDescription(P.desc);
+            }}
+          >
+            close
+          </button>
         </form>
       </dialog>
     </>

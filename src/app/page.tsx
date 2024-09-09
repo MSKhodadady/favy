@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
 import AppLogo from "@/public/favy-logo.svg";
 import Image from "next/image";
 import Link from "next/link";
+import { useRef, useState } from "react";
 
 export default function HomePage() {
   const [showSearch, setShowSearch] = useState(false);
@@ -33,7 +33,7 @@ export default function HomePage() {
           <Image src={AppLogo} alt="app logo" className="w-1/2 h-auto" />
           <h1 className="text-5xl my-5">فِیوی</h1>
           <h2 className="text-xl">
-            <em>علایقت رو به دوستات نشون بده!</em>
+            <em>علایقت رو با دوستات به اشتراک بذار!</em>
           </h2>
         </div>
       </div>

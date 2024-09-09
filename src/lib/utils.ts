@@ -25,3 +25,7 @@ export function hasErrorWithCode(error: any, code: string) {
     error.errors[0]?.extensions?.code == code
   );
 }
+
+export function isString(s: any) {
+  return typeof s == "string";
+}

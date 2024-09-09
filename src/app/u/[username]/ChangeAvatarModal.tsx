@@ -1,7 +1,7 @@
 "use client";
 
+import { useActionResChecker } from "@/src/lib/client/hooks/useActionResChecker";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
-import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
 import {
   faPen,
   faTrashCan,
@@ -17,8 +17,8 @@ export function ChangeAvatarModal(P: {
   avatarLink: string | null;
   username: string;
 }) {
-  const { showAlertTimeout } = useShowAlertTimeout();
   const { withLoading, loading } = useLoading();
+  const actionChecker = useActionResChecker();
 
   const inputFileRef = useRef<null | HTMLInputElement>(null);
   const dialogChangeRef = useRef<null | HTMLDialogElement>(null);
@@ -45,38 +45,23 @@ export function ChangeAvatarModal(P: {
 
       fd.append("avatar-img", inputAvatarImg);
 
-      const res = await changeUserAvatarAct(fd);
-
-      switch (res) {
-        case "success":
+      actionChecker({
+        res: await changeUserAvatarAct(fd),
+        onSuccess() {
           dialogChangeRef.current?.close();
-          break;
-
-        case "bad-req":
-        case "internal-error":
-          showAlertTimeout("خطای سرور", "warning");
-          break;
-
-        default:
-          break;
-      }
+        },
+      });
     });
   }
 
   function onDeleteAvatar() {
     withLoading(async () => {
-      const res = await deleteUserAvatarAct();
-      switch (res) {
-        case "success":
+      actionChecker({
+        res: await deleteUserAvatarAct(),
+        onSuccess() {
           dialogDeleteRef.current?.close();
-          break;
-        case "internal-error":
-          showAlertTimeout("خطای سرور", "warning");
-          break;
-
-        default:
-          break;
-      }
+        },
+      });
     });
   }
 

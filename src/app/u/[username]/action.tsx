@@ -1,11 +1,18 @@
 "use server";
 
+import { moviesApi } from "@/src/api/movies";
 import { userApi } from "@/src/api/user";
 import { AUTH_COOKIE_KEY, USERNAME_COOKIE_KEY } from "@/src/lib/constants";
+import { actionCommonErrChecker } from "@/src/lib/server/actionCommonErrChecker";
 import { getUsernameCookie } from "@/src/lib/server/cookieManager";
+import { isString } from "@/src/lib/utils";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+function revalidateUserPage() {
+  revalidatePath(`/u/${getUsernameCookie()}`);
+}
 
 export async function signOutAct() {
   const cks = cookies();
@@ -16,19 +23,21 @@ export async function signOutAct() {
 }
 
 export async function changeUserDescAct(description: string) {
-  try {
-    await userApi.changeUserDesc(description);
+  return actionCommonErrChecker(async () => {
+    try {
+      await userApi.changeUserDesc(description);
 
-    revalidatePath(`/u/${getUsernameCookie()}`);
+      revalidateUserPage();
 
-    return "success";
-  } catch (error: any) {
-    if (error?.message == "LONG-DESC") {
-      return "long-desc";
-    } else {
-      return "internal-error";
+      return "success";
+    } catch (error: any) {
+      if (error?.message == "LONG-DESC") {
+        return "long-desc";
+      }
+
+      throw error;
     }
-  }
+  });
 }
 
 export async function changeUserAvatarAct(fd: FormData) {
@@ -36,26 +45,49 @@ export async function changeUserAvatarAct(fd: FormData) {
 
   if (avatarFile == null || typeof avatarFile == "string") return "bad-req";
 
-  try {
+  return actionCommonErrChecker(async () => {
     await userApi.changeAvatar(avatarFile);
 
-    revalidatePath(`/u/${getUsernameCookie()}`);
+    revalidateUserPage();
 
     return "success";
-  } catch (error) {
-    console.log(error);
-    return "internal-error";
-  }
+  });
 }
 
 export async function deleteUserAvatarAct() {
-  try {
+  return actionCommonErrChecker(async () => {
     await userApi.deleteAvatar();
-    revalidatePath(`/u/${getUsernameCookie()}`);
+    revalidateUserPage();
 
     return "success";
-  } catch (error) {
-    console.log(error);
-    return "internal-error";
+  });
+}
+
+export async function createMovieAct(fd: FormData) {
+  const cks = cookies().get(AUTH_COOKIE_KEY)?.value;
+  if (!cks) return "no-user";
+
+  const name = fd.get("name");
+  const year = fd.get("year");
+  const poster = fd.get("poster");
+
+  if (
+    (poster != null && typeof poster == "string") ||
+    !name ||
+    !isString(name) ||
+    !year ||
+    !isString(year)
+  ) {
+    return "bad-req";
   }
+
+  return actionCommonErrChecker(async () => {
+    const movie = await moviesApi.addMovie(name, year, poster);
+
+    await userApi.addMovie(movie.id);
+
+    revalidateUserPage();
+
+    return "success";
+  });
 }
