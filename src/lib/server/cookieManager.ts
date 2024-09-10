@@ -16,7 +16,7 @@ export function setCookieFromServer(
 }
 
 export function getAuthCookie() {
-  return cookies().get(AUTH_COOKIE_KEY)?.value;
+  return cookies().get(AUTH_COOKIE_KEY)?.value ?? "no-auth";
 }
 
 export function getUsernameCookie() {

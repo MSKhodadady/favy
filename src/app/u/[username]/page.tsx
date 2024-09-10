@@ -8,9 +8,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignLayout } from "../../(sign)/SignLayout";
+import {
+  AvatarPlaceHolder,
+  AvatarViewer,
+} from "../../../components/AvatarViewer";
 import { MovieCard } from "../../../components/MovieCard";
 import { AddMovieModal } from "./AddMovieModal";
-import { AvatarPlaceHolder, AvatarViewer } from "./AvatarViewer";
 import { ChangeAvatarModal } from "./ChangeAvatarModal";
 import { ChangeDescModal } from "./ChangeDescModal";
 import { SignOutBtn } from "./SignOutBtn";
@@ -72,7 +75,7 @@ export default async function UserPage({
             <Link
               href="/sign-in"
               type="button"
-              className="btn btn-outline text-primary rounded-full italic text-xs h-fit min-h-fit py-1 px-1"
+              className="btn btn-outline btn-primary  rounded-full italic text-xs h-fit min-h-fit py-1 px-1"
             >
               علایقت خودت رو وارد کن!
             </Link>

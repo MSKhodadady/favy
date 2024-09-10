@@ -8,7 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { ChangeEvent, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createMovieAct } from "./action";
+import { useDebouncedCallback } from "use-debounce";
+import { addMovieAct, createMovieAct, searchMovieAct } from "./action";
 
 type AddMovie = {
   name: string;
@@ -16,8 +17,10 @@ type AddMovie = {
 };
 
 export function AddMovieModal() {
-  const modalRef = useRef<ModalHandle>(null);
-  const inputFileRef = useRef<HTMLInputElement>(null);
+  const modalRefCreateMovie = useRef<ModalHandle>(null);
+  const modalRefSearchMovie = useRef<ModalHandle>(null);
+
+  const inputRefMoviePosterImgFile = useRef<HTMLInputElement>(null);
   const { loading, withLoading } = useLoading();
   const actionChecker = useActionResChecker();
 
@@ -29,6 +32,11 @@ export function AddMovieModal() {
   } = useForm<AddMovie>();
 
   const [inputImg, setInputImg] = useState(null as null | File);
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState(
+    [] as MovieSearchRowData[]
+  );
+  const [showAddNewBtn, setShowAddNewBtn] = useState(false);
 
   function onImgAdded(e: ChangeEvent<HTMLInputElement>) {
     const { files } = e.target;
@@ -53,6 +61,8 @@ export function AddMovieModal() {
             "فیلم ثبت شد. پس از تایید قابل نمایش خواهد بود.",
             "success"
           );
+          modalRefCreateMovie.current?.closeModal();
+          cleanUp();
         },
         onOther(r, alertShower, router) {
           if (r == "no-user") {
@@ -66,25 +76,88 @@ export function AddMovieModal() {
     });
   }
 
+  const doSearchText = useDebouncedCallback(async (q: string) => {
+    setShowAddNewBtn(false);
+
+    if (q == "") {
+      setSearchResults([]);
+      return;
+    }
+
+    const res = await searchMovieAct(q);
+
+    setSearchResults(res);
+
+    if (res.length == 0) {
+      setShowAddNewBtn(true);
+    }
+  }, 1000);
+
+  function cleanUp() {
+    setSearchResults([]);
+    setSearchText("");
+    setShowAddNewBtn(false);
+    reset();
+    setInputImg(null);
+  }
+
   return (
     <>
       <button
         type="button"
         className="btn btn-outline text-white w-full border-dashed border-2"
         onClick={() => {
-          modalRef.current?.showModal();
+          modalRefSearchMovie.current?.showModal();
         }}
       >
         <FontAwesomeIcon icon={faSquarePlus} className="w-5 h-5" />
       </button>
 
+      {/* SEARCH MOVIE MODAL */}
       <Modal
-        ref={modalRef}
-        onBackDropClick={() => {
-          reset();
-          setInputImg(null);
-        }}
+        ref={modalRefSearchMovie}
+        className="h-2/3"
+        onBackDropClick={cleanUp}
       >
+        <input
+          type="text"
+          className="input input-bordered text-2xl w-full"
+          placeholder="نام فیلم"
+          value={searchText}
+          onChange={(e) => {
+            const { value } = e.target;
+            setSearchText(value);
+            doSearchText(value);
+          }}
+        />
+
+        {searchResults.map((i) => (
+          <MovieSearchRow
+            key={i.id}
+            {...i}
+            onClick={async () => {
+              actionChecker({
+                res: await addMovieAct(i.id),
+                onSuccess(alertShower, router) {
+                  cleanUp();
+                  modalRefSearchMovie.current?.closeModal();
+                },
+              });
+            }}
+          />
+        ))}
+        {showAddNewBtn && (
+          <AddNewButton
+            onClick={() => {
+              modalRefSearchMovie.current?.closeModal();
+              modalRefCreateMovie.current?.showModal();
+            }}
+            className="mt-3"
+          />
+        )}
+      </Modal>
+      {/* ADD NEW MOVIE MODAL */}
+      <Modal ref={modalRefCreateMovie} onBackDropClick={cleanUp}>
         <form onSubmit={handleSubmit(onFormSubmit)}>
           <div className="flex w-full">
             {inputImg ? (
@@ -102,7 +175,7 @@ export function AddMovieModal() {
                 type="button"
                 className="btn btn-outline text-primary min-w-28 w-28 h-44 hover:text-primary active:text-primary"
                 onClick={() => {
-                  inputFileRef.current?.click();
+                  inputRefMoviePosterImgFile.current?.click();
                 }}
               >
                 <FontAwesomeIcon icon={faSquarePlus} size="3x" />
@@ -138,7 +211,7 @@ export function AddMovieModal() {
                 className="hidden"
                 accept="image/*"
                 onChange={onImgAdded}
-                ref={inputFileRef}
+                ref={inputRefMoviePosterImgFile}
               />
             </div>
           </div>
@@ -152,5 +225,53 @@ export function AddMovieModal() {
         </form>
       </Modal>
     </>
+  );
+}
+
+function AddNewButton(P: { onClick: () => void; className?: string }) {
+  return (
+    <button
+      type="button"
+      className={`btn btn-outline btn-primary w-full border-dashed border-2 ${
+        P.className ?? ""
+      }`}
+      onClick={P.onClick}
+    >
+      <FontAwesomeIcon icon={faSquarePlus} className="w-5 h-5" /> اضافه کردن
+      فیلم جدید
+    </button>
+  );
+}
+
+type MovieSearchRowData = {
+  id: string;
+  posterLink?: string;
+  name: string;
+  endYear: string;
+};
+function MovieSearchRow(P: MovieSearchRowData & { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="btn btn-ghost px-0 min-h-fit h-fit py-3
+     flex items-center gap-2"
+      onClick={P.onClick}
+    >
+      {P.posterLink ? (
+        <Image
+          src={P.posterLink}
+          alt={`movie: "${P.name}" poster`}
+          height={100}
+          width={100}
+          className="h-10 w-10 rounded-lg"
+        />
+      ) : (
+        <div className="h-10 w-10 rounded-lg bg-primary " />
+      )}
+
+      <span>
+        {P.name} - {P.endYear}
+      </span>
+    </button>
   );
 }

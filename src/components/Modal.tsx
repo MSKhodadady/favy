@@ -11,6 +11,7 @@ export const Modal = forwardRef<
     withoutBackDrop?: boolean;
     actions?: ReactNode;
     children?: ReactNode;
+    className?: string;
     onBackDropClick?: () => void;
   }
 >(function Modal(P, ref) {
@@ -30,7 +31,7 @@ export const Modal = forwardRef<
 
   return (
     <dialog ref={dialogRef} className="modal">
-      <div className="modal-box">
+      <div className={`modal-box ${P.className ?? ""}`}>
         {P.children}
         {P.actions && <div className="modal-action">{P.actions}</div>}
       </div>

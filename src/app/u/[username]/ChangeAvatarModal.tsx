@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBar } from "@/src/components/LoadingBar";
 import { useActionResChecker } from "@/src/lib/client/hooks/useActionResChecker";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
 import {
@@ -9,8 +10,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChangeEvent, useRef, useState } from "react";
+import {
+  AvatarPlaceHolder,
+  AvatarViewer,
+} from "../../../components/AvatarViewer";
 import { changeUserAvatarAct, deleteUserAvatarAct } from "./action";
-import { AvatarPlaceHolder, AvatarViewer } from "./AvatarViewer";
 
 export function ChangeAvatarModal(P: {
   avatarId: string | null;
@@ -154,11 +158,7 @@ export function ChangeAvatarModal(P: {
               disabled={loading}
               onClick={onRegisterAvatar}
             >
-              {loading ? (
-                <progress className="progress progress-success w-full"></progress>
-              ) : (
-                "ثبت"
-              )}
+              {loading ? <LoadingBar /> : "ثبت"}
             </button>
           </div>
         </div>

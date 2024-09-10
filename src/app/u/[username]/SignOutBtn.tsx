@@ -7,7 +7,8 @@ export function SignOutBtn() {
   return (
     <button
       type="button"
-      className="bg-primary w-10 h-10 p-1 rounded-full"
+      className="btn btn-primary min-h-fit
+      bg-primary w-10 h-10 p-1 rounded-full"
       onClick={async () => {
         await signOutAct();
       }}

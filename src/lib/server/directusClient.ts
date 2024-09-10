@@ -1,4 +1,12 @@
-import { createDirectus, rest, staticToken } from "@directus/sdk";
+import {
+  createDirectus,
+  rest,
+  RestCommand,
+  staticToken,
+  withToken,
+} from "@directus/sdk";
+import { cookies } from "next/headers";
+import { AUTH_COOKIE_KEY } from "../constants";
 
 function getDirectusUrl() {
   const DIRECTUS_PROTOCOL =
@@ -17,6 +25,16 @@ export function getDirectusFileLink(id: string) {
 }
 
 export const directusUserClient = createDirectus(getDirectusUrl()).with(rest());
+
+export async function directusUserClientRequestWithAuthCookie<Output>(
+  doer: RestCommand<Output, any>
+) {
+  const cks = cookies();
+
+  return await directusUserClient.request(
+    withToken(cks.get(AUTH_COOKIE_KEY)?.value ?? "no-auth", doer)
+  );
+}
 
 export const directusServerClient = createDirectus(getDirectusUrl())
   .with(staticToken(process.env.DIRECTUS_ADMIN!))

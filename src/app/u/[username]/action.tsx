@@ -5,6 +5,7 @@ import { userApi } from "@/src/api/user";
 import { AUTH_COOKIE_KEY, USERNAME_COOKIE_KEY } from "@/src/lib/constants";
 import { actionCommonErrChecker } from "@/src/lib/server/actionCommonErrChecker";
 import { getUsernameCookie } from "@/src/lib/server/cookieManager";
+import { getDirectusFileLink } from "@/src/lib/server/directusClient";
 import { isString } from "@/src/lib/utils";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
@@ -14,6 +15,17 @@ function revalidateUserPage() {
   revalidatePath(`/u/${getUsernameCookie()}`);
 }
 
+export async function searchMovieAct(q: string) {
+  const res = await moviesApi.searchMovie(q);
+  return res.map((i) => ({
+    id: i.id,
+    name: i.Name,
+    endYear: i.end_year,
+    posterLink: getDirectusFileLink(i.poster),
+  }));
+}
+
+//: NEED LOGIN ACTION ---------------------------------------------------------
 export async function signOutAct() {
   const cks = cookies();
   cks.delete(AUTH_COOKIE_KEY);
@@ -88,6 +100,14 @@ export async function createMovieAct(fd: FormData) {
 
     revalidateUserPage();
 
+    return "success";
+  });
+}
+
+export async function addMovieAct(movieId: string) {
+  return actionCommonErrChecker(async () => {
+    await userApi.addMovie(movieId);
+    revalidateUserPage();
     return "success";
   });
 }

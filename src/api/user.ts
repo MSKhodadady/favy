@@ -8,14 +8,13 @@ import {
   updateMe,
   updateUser,
   uploadFiles,
-  withToken,
 } from "@directus/sdk";
 import { RegisterInput } from "../app/(sign)/sign-up/page";
-import { getAuthCookie } from "../lib/server/cookieManager";
 import {
   directusPublicClient,
   directusServerClient,
   directusUserClient,
+  directusUserClientRequestWithAuthCookie,
 } from "../lib/server/directusClient";
 import { getUserDescLimit } from "../lib/server/envGetter";
 
@@ -74,53 +73,28 @@ export const userApi = {
 
   //: for logged in users {
   async getCurrentUser(fields: string[]) {
-    const authCookie = getAuthCookie();
-    if (authCookie == undefined) throw Error("no-such-user");
-
-    const currentUser = await directusUserClient.request(
-      withToken(authCookie, readMe({ fields }))
-    );
-    if (!currentUser) throw Error("no-such-user");
-
-    return { currentUser, authCookie };
+    return await directusUserClientRequestWithAuthCookie(readMe({ fields }));
   },
 
   async changeUserDesc(description: string) {
-    const authCookie = getAuthCookie();
-
-    if (authCookie == undefined) return;
-
     if (description.length > getUserDescLimit()) {
       throw Error("LONG-DESC");
     }
 
-    await directusUserClient.request(
-      withToken(
-        authCookie,
-        updateMe({
-          description: description.trim(),
-        })
-      )
+    await directusUserClientRequestWithAuthCookie(
+      updateMe({
+        description: description.trim(),
+      })
     );
   },
 
   async changeAvatar(avatarFile: File) {
-    const authCookie = getAuthCookie();
-
-    if (authCookie == undefined) return;
-
-    const currentUser = await directusUserClient.request(
-      withToken(authCookie, readMe({ fields: ["avatar"] }))
-    );
-
-    if (!currentUser) throw Error("no-such-user");
+    const currentUser = await this.getCurrentUser(["avatar"]);
 
     //: delete previous avatar file if exists
     const { avatar } = currentUser;
     if (avatar != null) {
-      await directusUserClient.request(
-        withToken(authCookie, updateMe({ avatar: null }))
-      );
+      await directusUserClientRequestWithAuthCookie(updateMe({ avatar: null }));
       await directusServerClient.request(deleteFile(avatar));
     }
 
@@ -130,35 +104,34 @@ export const userApi = {
     const f = await directusServerClient.request(uploadFiles(fd));
 
     //:
-    await directusUserClient.request(
-      withToken(authCookie, updateMe({ avatar: f.id }))
-    );
+    await directusUserClientRequestWithAuthCookie(updateMe({ avatar: f.id }));
   },
 
   async deleteAvatar() {
-    const { currentUser, authCookie } = await this.getCurrentUser(["avatar"]);
+    const currentUser = await this.getCurrentUser(["avatar"]);
 
     const { avatar } = currentUser;
     if (avatar != null) {
-      await directusUserClient.request(
-        withToken(authCookie, updateMe({ avatar: null }))
-      );
+      await directusUserClientRequestWithAuthCookie(updateMe({ avatar: null }));
       await directusServerClient.request(deleteFile(avatar));
     }
   },
 
   async addMovie(movieId: string) {
-    const { currentUser, authCookie } = await this.getCurrentUser(["id"]);
+    const currentUser = await this.getCurrentUser(["id", "fav_movie.Movie_id"]);
 
-    const r = await directusUserClient.request(
-      withToken(
-        authCookie,
+    if (
+      !(currentUser.fav_movie as { Movie_id: string }[]).some(
+        ({ Movie_id }) => Movie_id == movieId
+      )
+    ) {
+      const r = await directusUserClientRequestWithAuthCookie(
         createItem("MovieFav", {
           Movie_id: movieId,
           user_id: currentUser.id,
         })
-      )
-    );
+      );
+    }
   },
   //: }
 };
