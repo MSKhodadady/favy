@@ -111,3 +111,12 @@ export async function addMovieAct(movieId: string) {
     return "success";
   });
 }
+
+export async function deleteMovieFromUserAct(movieId: string) {
+  return actionCommonErrChecker(async () => {
+    const res = await userApi.deleteMovie(movieId);
+
+    revalidateUserPage();
+    return "success";
+  });
+}

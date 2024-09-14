@@ -124,10 +124,12 @@ export default async function UserPage({
             {userMovies.map((i) => (
               <MovieCard
                 key={i.id}
+                id={i.id}
                 name={i.Name}
                 startYear={i.start_year}
                 endYear={i.end_year}
                 posterLink={i.poster}
+                loggedIn={isLoggedIn}
               />
             ))}
             {isLoggedIn && <AddMovieModal />}
