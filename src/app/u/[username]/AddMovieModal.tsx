@@ -46,7 +46,7 @@ export function AddMovieModal() {
     }
   }
 
-  async function onFormSubmit({ name, year }: AddMovie) {
+  async function onCreateMovieFormSubmit({ name, year }: AddMovie) {
     const fd = new FormData();
     fd.append("name", name);
     fd.append("year", year);
@@ -158,7 +158,7 @@ export function AddMovieModal() {
       </Modal>
       {/* ADD NEW MOVIE MODAL */}
       <Modal ref={modalRefCreateMovie} onBackDropClick={cleanUp}>
-        <form onSubmit={handleSubmit(onFormSubmit)}>
+        <form onSubmit={handleSubmit(onCreateMovieFormSubmit)}>
           <div className="flex w-full">
             {inputImg ? (
               <div className="min-w-28 w-28 h-44 overflow-hidden rounded-lg">

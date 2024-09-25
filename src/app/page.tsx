@@ -1,14 +1,33 @@
 "use client";
 
 import AppLogo from "@/public/favy-logo.svg";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function HomePage() {
   const [showSearch, setShowSearch] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const [userSearchResults, setUserSearchResults] = useState(
+    [] as { avatarLink: string; username: string }[]
+  );
+
+  const doSearchUsers = useDebouncedCallback((q: string) => {
+    if (q == "") {
+      setUserSearchResults([]);
+    } else {
+      setUserSearchResults([
+        { avatarLink: "", username: "ssssssssssss" },
+        { avatarLink: "", username: "ssssssssssss" },
+        { avatarLink: "", username: "ssssssssssss" },
+      ]);
+    }
+  }, 1000);
 
   return (
     <div
@@ -67,30 +86,55 @@ export default function HomePage() {
             علایق دوستت رو پیدا کن!
           </button>
         ) : (
-          <div className="flex items-center rounded-full bg-white p-2">
-            <button
-              type="button"
-              className="btn btn-primary rounded-full  p-3 min-h-fit h-fit "
+          <div
+            className={`dropdown ${
+              userSearchResults.length > 0 ? "dropdown-open" : ""
+            }`}
+          >
+            <form
+              className="flex items-center rounded-full bg-white p-2 h-12"
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}
+              tabIndex={0}
+              role="button"
             >
-              &#128269;
-            </button>
-            <input
-              type="text"
-              ref={searchInputRef}
-              name=""
-              id=""
-              className="input flex-grow text-black ms-2 border-none active:border-none h-100% placeholder:text-sm w-full"
-              placeholder="علایق دوستت رو پیدا کن!"
-            />
-            <button
-              type="button"
-              className="btn btn-ghost rounded-full text-slate-400 text-lg px-3 pt-2 pb-1 min-h-fit h-fit"
-              onClick={() => setShowSearch(false)}
+              <button
+                type="submit"
+                className="btn btn-primary rounded-full  p-3 min-h-fit h-fit "
+              >
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </button>
+              <input
+                type="text"
+                ref={searchInputRef}
+                name=""
+                id=""
+                className="input flex-grow text-black ms-2 border-none active:border-none h-full placeholder:text-sm w-full"
+                placeholder="علایق دوستت رو پیدا کن!"
+              />
+              <button
+                type="button"
+                className="btn btn-ghost rounded-full text-slate-400 text-lg px-3 pt-2 pb-1 min-h-fit h-fit"
+                onClick={() => setShowSearch(false)}
+              >
+                &#10799;
+              </button>
+            </form>
+
+            <ul
+              className="menu dropdown-content z-20 bg-white text-black rounded-box shadow w-full mt-1"
+              tabIndex={0}
             >
-              &#10799;
-            </button>
+              {userSearchResults.map((i) => (
+                <li>
+                  <button className="btn btn-ghost">{i.username}</button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
+        <p className="text-9xl">HELLO WORLD</p>
       </div>
     </div>
   );
