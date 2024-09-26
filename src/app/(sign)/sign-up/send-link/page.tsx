@@ -19,6 +19,7 @@ export default function SendAgainVerificationLinkPage() {
   const router = useRouter();
   return (
     <SignLayout title="ارسال دوباره ایمیل تایید">
+      <title>ثبت نام</title>
       <form
         onSubmit={handleSubmit(async (data) => {
           const res = await sendLinkAgainAct(data.email);

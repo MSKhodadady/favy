@@ -20,10 +20,6 @@ import { SignOutBtn } from "./SignOutBtn";
 
 export const revalidate = 86400;
 
-export const metadata = {
-  title: "صفحه کاربر",
-};
-
 export default async function UserPage({
   params: { username },
   searchParams,
@@ -59,6 +55,7 @@ export default async function UserPage({
 
   return (
     <div className="bg-primary">
+      <title>{username}</title>
       <div className=" bg-white rounded-b-2xl">
         <div className="flex flex-row-reverse justify-between items-center p-3">
           <Link href={"/"}>

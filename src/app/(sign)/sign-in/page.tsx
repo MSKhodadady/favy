@@ -57,6 +57,7 @@ export default function LoginPage() {
 
   return (
     <SignLayout title="ورود">
+      <title>ورود</title>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col items-stretch gap-2"

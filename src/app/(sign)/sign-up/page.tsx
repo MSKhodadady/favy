@@ -64,6 +64,7 @@ export default function SignPage() {
 
   return (
     <SignLayout title="ثبت نام" className="space-y-2">
+      <title>ثبت نام</title>
       {/* EMAIL */}
       <form onSubmit={onSubmit} className="flex flex-col gap-2">
         <TextInput
