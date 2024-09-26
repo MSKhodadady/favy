@@ -17,10 +17,32 @@ import {
   directusServerClient,
   directusUserClient,
   directusUserClientRequestWithAuthCookie,
+  getDirectusFileLink,
 } from "../lib/server/directusClient";
 import { getUserDescLimit } from "../lib/server/envGetter";
 
 export const userApi = {
+  async searchUsername(
+    q: string
+  ): Promise<{ avatarLink?: string; username: string }[]> {
+    const res = await directusPublicClient.request(
+      readUsers({
+        filter: {
+          username: {
+            _contains: q,
+          },
+        },
+        fields: ["username", "avatar"],
+        limit: 10,
+      })
+    );
+
+    return res.map((i) => ({
+      username: i.username,
+      avatarLink: i.avatar == null ? undefined : getDirectusFileLink(i.avatar),
+    }));
+  },
+
   async createUser(ri: RegisterInput) {
     return directusServerClient.request(
       dCreateUser({

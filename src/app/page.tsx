@@ -7,6 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { AvatarPlaceHolder, AvatarViewer } from "../components/AvatarViewer";
+import { searchUsernameAct } from "./actions";
 
 export default function HomePage() {
   const [showSearch, setShowSearch] = useState(false);
@@ -14,25 +16,21 @@ export default function HomePage() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [userSearchResults, setUserSearchResults] = useState(
-    [] as { avatarLink: string; username: string }[]
+    [] as { avatarLink?: string; username: string }[]
   );
 
   const doSearchUsers = useDebouncedCallback((q: string) => {
     if (q == "") {
       setUserSearchResults([]);
     } else {
-      setUserSearchResults([
-        { avatarLink: "", username: "ssssssssssss" },
-        { avatarLink: "", username: "ssssssssssss" },
-        { avatarLink: "", username: "ssssssssssss" },
-      ]);
+      searchUsernameAct(q).then(setUserSearchResults);
     }
   }, 1000);
 
   return (
     <div
       className="
-        pt-3 min-h-lvh overflow-hidden flex flex-col items-center
+        pt-3 min-h-screen overflow-x-hidden  flex flex-col items-center
         md:flex-row
       "
       style={{
@@ -95,6 +93,7 @@ export default function HomePage() {
               className="flex items-center rounded-full bg-white p-2 h-12"
               onSubmit={(e) => {
                 e.preventDefault();
+                doSearchUsers(searchInputRef.current?.value ?? "");
               }}
               tabIndex={0}
               role="button"
@@ -108,33 +107,52 @@ export default function HomePage() {
               <input
                 type="text"
                 ref={searchInputRef}
-                name=""
-                id=""
+                onChange={(e) => {
+                  doSearchUsers(e.target.value);
+                }}
                 className="input flex-grow text-black ms-2 border-none active:border-none h-full placeholder:text-sm w-full"
                 placeholder="علایق دوستت رو پیدا کن!"
               />
               <button
                 type="button"
                 className="btn btn-ghost rounded-full text-slate-400 text-lg px-3 pt-2 pb-1 min-h-fit h-fit"
-                onClick={() => setShowSearch(false)}
+                onClick={() => {
+                  if (searchInputRef.current) {
+                    searchInputRef.current.value = "";
+                  }
+                  setShowSearch(false);
+                  setUserSearchResults([]);
+                }}
               >
                 &#10799;
               </button>
             </form>
 
-            <ul
-              className="menu dropdown-content z-20 bg-white text-black rounded-box shadow w-full mt-1"
-              tabIndex={0}
-            >
-              {userSearchResults.map((i) => (
-                <li>
-                  <button className="btn btn-ghost">{i.username}</button>
-                </li>
-              ))}
-            </ul>
+            {userSearchResults.length > 0 && (
+              <ul
+                className="dropdown-content z-20  mt-1 pb-8 w-full"
+                tabIndex={0}
+              >
+                <div className="bg-white text-black rounded-box shadow w-full">
+                  {userSearchResults.map((i) => (
+                    <Link
+                      key={i.username}
+                      href={`/u/${i.username}`}
+                      className="btn btn-ghost flex justify-start p-1"
+                    >
+                      {i.avatarLink != null ? (
+                        <AvatarViewer compact avatarLink={i.avatarLink} />
+                      ) : (
+                        <AvatarPlaceHolder compact />
+                      )}
+                      <p>{i.username}</p>
+                    </Link>
+                  ))}
+                </div>
+              </ul>
+            )}
           </div>
         )}
-        <p className="text-9xl">HELLO WORLD</p>
       </div>
     </div>
   );
