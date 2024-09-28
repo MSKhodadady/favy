@@ -3,6 +3,7 @@ import { userApi } from "@/src/api/user";
 import { favyLogoWithTitle } from "@/src/lib/client/assets";
 import { AUTH_COOKIE_KEY, USERNAME_COOKIE_KEY } from "@/src/lib/constants";
 import { getDirectusFileLink } from "@/src/lib/server/directusClient";
+import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,6 +20,15 @@ import { ChangeDescModal } from "./ChangeDescModal";
 import { SignOutBtn } from "./SignOutBtn";
 
 export const revalidate = 86400;
+
+export const metadata: Metadata = {
+  icons: [
+    {
+      url: "small-logo.svg",
+      type: "image/x-icon",
+    },
+  ],
+};
 
 export default async function UserPage({
   params: { username },
