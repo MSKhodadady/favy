@@ -9,15 +9,7 @@ import { cookies } from "next/headers";
 import { AUTH_COOKIE_KEY } from "../constants";
 
 function getDirectusUrl() {
-  const DIRECTUS_PROTOCOL =
-    /** @type {"http" | "https"} */ process.env.DIRECTUS_PROTOCOL ?? "http";
-  const DIRECTUS_HOSTNAME = process.env.DIRECTUS_HOSTNAME ?? "";
-  if (DIRECTUS_HOSTNAME.length == 0)
-    throw Error("No directus hostname in env.");
-
-  const DIRECTUS_PORT = process.env.DIRECTUS_PORT ?? "8055";
-
-  return `${DIRECTUS_PROTOCOL}://${DIRECTUS_HOSTNAME}:${DIRECTUS_PORT}`;
+  return process.env.DIRECTUS_URL ?? "http://localhost:8055";
 }
 
 export function getDirectusFileLink(id: string) {

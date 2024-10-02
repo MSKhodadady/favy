@@ -1,11 +1,10 @@
-import Link from "next/link";
-import { SignLayout } from "../../SignLayout";
-import { redirect } from "next/navigation";
-import { verifyEmailVerificationToken } from "@/src/lib/server/tokenService";
 import { userApi } from "@/src/api/user";
+import { verifyEmailVerificationToken } from "@/src/lib/server/tokenService";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { SignLayout } from "../../SignLayout";
 
 export default async function VerifyRegistrationPage({
-  params,
   searchParams,
 }: {
   params: {};
@@ -40,20 +39,25 @@ export default async function VerifyRegistrationPage({
     return <>آدرس نامعتبر است.</>;
   }
 
-  //: set user verified
-  const r = await userApi.setVerified(res.email);
+  try {
+    //: set user verified
+    const r = await userApi.setVerified(res.email);
 
-  if (r == "user-not-exist") {
-    return <>کاربری با این ایمیل وجود ندارد.</>;
+    if (r == "user-not-exist") {
+      return <>کاربری با این ایمیل وجود ندارد.</>;
+    }
+
+    return (
+      <SignLayout title="ثبت نام با موفقیت تایید شد">
+        <Link href={`/sign-in`}>
+          <button type="button" className="btn btn-primary w-full">
+            رفتن به صفحه ورود
+          </button>
+        </Link>
+      </SignLayout>
+    );
+  } catch (error) {
+    console.error(error);
+    redirect("/internal-server-error");
   }
-
-  return (
-    <SignLayout title="ثبت نام با موفقیت تایید شد">
-      <Link href={`/sign-in`}>
-        <button type="button" className="btn btn-primary w-full">
-          رفتن به صفحه ورود
-        </button>
-      </Link>
-    </SignLayout>
-  );
 }

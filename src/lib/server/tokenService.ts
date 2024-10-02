@@ -1,5 +1,4 @@
 import { jwtVerify, SignJWT } from "jose";
-import { JWTExpired } from "jose/dist/types/util/errors";
 
 const APP_KEY = process.env.APP_KEY!;
 
@@ -24,9 +23,8 @@ export async function createVerificationToken({
 }
 
 export async function verifyEmailVerificationToken(token: string) {
-  const secret = new TextEncoder().encode(process.env.APP_KEY!);
-
   try {
+    const secret = new TextEncoder().encode(process.env.APP_KEY!);
     const { payload } = await jwtVerify<EmailVerificationTokenPayload>(
       token,
       secret

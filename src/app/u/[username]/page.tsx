@@ -32,20 +32,27 @@ export const metadata: Metadata = {
 
 export default async function UserPage({
   params: { username },
-  searchParams,
 }: {
   params: { username?: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   if (username == undefined) redirect("/");
 
-  const serverUser = await userApi.findUserByUsername(username, [
-    "id",
-    "description",
-    "username",
-    "fav_movie.Movie_id",
-    "avatar",
-  ]);
+  const serverUser = await (async () => {
+    try {
+      return await userApi.findUserByUsername(username, [
+        "id",
+        "description",
+        "username",
+        "fav_movie.Movie_id",
+        "avatar",
+      ]);
+    } catch (error) {
+      console.error(error);
+      return "error";
+    }
+  })();
+
+  if (serverUser == "error") redirect("/internal-server-error");
 
   if (serverUser == null) return <SignLayout title="چنین کاربری وجود ندارد!" />;
 
