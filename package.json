@@ -16,6 +16,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@persian-tools/persian-tools": "^3.5.2",
+    "@prisma/client": "^5.20.0",
     "@reduxjs/toolkit": "^2.2.7",
     "@types/node": "^20.3.1",
     "@types/react": "^18.2.12",
@@ -43,6 +44,7 @@
     "node": "18.20.4"
   },
   "devDependencies": {
-    "@types/nodemailer": "^6.4.15"
+    "@types/nodemailer": "^6.4.15",
+    "prisma": "^5.20.0"
   }
 }
