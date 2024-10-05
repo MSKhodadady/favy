@@ -29,3 +29,21 @@ export function hasErrorWithCode(error: any, code: string) {
 export function isString(s: any) {
   return typeof s == "string";
 }
+
+export function getFileNameExt(fileName: string) {
+  const reg = /.+\.(.+)/;
+  const res = reg.exec(fileName);
+
+  if (res != null) {
+    const ext = res[1];
+
+    return ext ?? "";
+  }
+
+  return "";
+}
+
+export function nanDefaulter(n: any, defaultN: number) {
+  const k = Number(n);
+  return Number.isNaN(k) ? defaultN : k;
+}
