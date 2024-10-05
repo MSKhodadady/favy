@@ -3,7 +3,7 @@
 import { userApi } from "@/src/api/user";
 import { sendRegistrationMail } from "@/src/lib/server/emailer";
 import { WEBSITE_URL } from "@/src/lib/server/envGetter";
-import { createVerificationToken } from "@/src/lib/server/tokenService";
+import { createToken } from "@/src/lib/server/tokenService";
 
 export async function sendLinkAgainAct(email: string) {
   const user = await userApi.findUserByEmail(email, ["id", "username"]);
@@ -11,9 +11,10 @@ export async function sendLinkAgainAct(email: string) {
   if (user == null) return "user-not-found";
 
   try {
-    const jwt = await createVerificationToken({
+    const jwt = await createToken({
       email,
       username: user.username,
+      id: user.id,
     });
     const link = `${WEBSITE_URL}/sign-up/verify?token=${jwt}`;
 

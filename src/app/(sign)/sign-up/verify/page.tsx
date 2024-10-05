@@ -1,5 +1,5 @@
 import { userApi } from "@/src/api/user";
-import { verifyEmailVerificationToken } from "@/src/lib/server/tokenService";
+import { verifyToken } from "@/src/lib/server/tokenService";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignLayout } from "../../SignLayout";
@@ -15,7 +15,7 @@ export default async function VerifyRegistrationPage({
     redirect("/");
   }
 
-  const res = await verifyEmailVerificationToken(token);
+  const res = await verifyToken(token);
 
   if (res == "expired") {
     return (

@@ -1,27 +1,25 @@
 "use server";
 
-import { directusServerClient } from "@/src/lib/server/directusClient";
+import { userApi } from "@/src/api/user";
 import { sendRegistrationMail } from "@/src/lib/server/emailer";
-import { createVerificationToken } from "@/src/lib/server/tokenService";
-import { createUser } from "@directus/sdk";
-import { RegisterInput } from "./page";
 import { WEBSITE_URL } from "@/src/lib/server/envGetter";
+import { createToken } from "@/src/lib/server/tokenService";
 import { hasErrorWithCode } from "@/src/lib/utils";
+import { RegisterInput } from "./page";
 
 export async function registerAct(ri: RegisterInput) {
-  const jwt = await createVerificationToken(ri);
-  const link = `${WEBSITE_URL}/sign-up/verify?token=${jwt}`;
-
   try {
     console.info("[register-user] create user");
-    await directusServerClient.request(
-      createUser({
-        email: ri.email,
-        password: ri.password,
-        // @ts-ignore
-        username: ri.username,
-      })
-    );
+    const user = await userApi.createUser(ri);
+
+    const { email, username } = ri;
+    const jwt = await createToken({
+      email,
+      username,
+      id: user.id,
+    });
+
+    const link = `${WEBSITE_URL}/sign-up/verify?token=${jwt}`;
 
     console.info("[register-user] sending email");
     await sendRegistrationMail(ri.email, link);
