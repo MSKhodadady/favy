@@ -5,6 +5,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { getFileNameExt } from "../utils";
 
 function S3Helper() {
   const envConfig = {
@@ -71,3 +72,15 @@ function S3Helper() {
 const s3Helper = S3Helper();
 
 export default s3Helper;
+
+export function userAvatarFileName(username: string, uploadedFileName: string) {
+  return `avatar_u(${username})_t(${Math.floor(
+    Date.now() / 1000
+  )}).${getFileNameExt(uploadedFileName)}`;
+}
+
+export function movieFileName(movieId: number, uploadedFileName: string) {
+  return `movie_id(${String(movieId)})_t(${Math.floor(
+    Date.now() / 1000
+  )}).${getFileNameExt(uploadedFileName)}`;
+}

@@ -1,11 +1,11 @@
 import { RegisterInput } from "@/src/app/(sign)/sign-up/page";
+import { Movie } from "@prisma/client";
 import { createHash } from "crypto";
 import { cookies } from "next/headers";
 import { AUTH_COOKIE_KEY } from "../constants";
 import { USER_MAX_FAV_NUM } from "../envLoader";
-import { getFileNameExt } from "../utils";
 import prisma from "./prisma";
-import s3Helper from "./s3";
+import s3Helper, { movieFileName, userAvatarFileName } from "./s3";
 import {
   createToken,
   getLoginTokenExpireTime,
@@ -17,7 +17,10 @@ type PrismaUserSelect = Exclude<
   undefined
 >["select"];
 
-const dbTransactions = {
+/**
+ * This functions, has no validation, has no try-catch (expect some places to discard non-important error).
+ */
+export const dbTransactions = {
   user: {
     async searchUsername(u: string) {
       const res = await prisma.user.findMany({
@@ -38,7 +41,7 @@ const dbTransactions = {
       return res;
     },
     async createUser(ri: RegisterInput) {
-      const { email, password, passwordRepeat, username } = ri;
+      const { email, password, username } = ri;
       const res = await prisma.user.create({
         data: {
           username,
@@ -179,9 +182,7 @@ const dbTransactions = {
           s3Helper.deleteFile(user.avatar);
         }
 
-        const fileName = `avatar_u(${user.username})_t(${Math.floor(
-          Date.now() / 1000
-        )}).${getFileNameExt(avatarFile.name)}`;
+        const fileName = userAvatarFileName(user.username, avatarFile.name);
 
         //: save file to s3
         s3Helper.uploadFile(avatarFile, fileName);
@@ -229,8 +230,19 @@ const dbTransactions = {
           });
         }
       },
-      async deleteMovie(movieId: string) {
+      async deleteMovie(movieId: number) {
         const user = await this.getCurrentUser();
+
+        if (user == null) return;
+        const mf = await prisma.movieFav.findFirst({
+          where: { userId: user.id, movieId },
+        });
+
+        if (mf) {
+          await prisma.movieFav.delete({
+            where: { id: mf.id },
+          });
+        }
       },
     },
   },
@@ -244,13 +256,56 @@ const dbTransactions = {
 
       return m;
     },
-    async addMovie(name: string, year: string, posterImg: File | null) {},
-    async searchMovie(query: string) {},
+    async addMovie(
+      name: string,
+      endYear: number,
+      posterImg?: File,
+      startYear?: number
+    ) {
+      //: db
+      const m = await prisma.movie.create({
+        data: {
+          endYear,
+          startYear,
+          name,
+        },
+      });
+
+      //: upload file
+      if (posterImg) {
+        try {
+          const fileName = movieFileName(m.id, posterImg.name);
+          await s3Helper.uploadFile(posterImg, fileName);
+          //: set db poster file id
+
+          await prisma.movie.update({
+            where: { id: m.id },
+            data: { poster: fileName },
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+    async searchMovie(query: string) {
+      const res: Movie & { sim: number } = await prisma.$queryRaw`
+        SELECT
+          *,
+          SIMILARITY(
+            concat("name", coalesce ("start_year"::text, ''), "end_year"),
+            ${query}
+          ) as sim
+        FROM "Movie"
+        order by sim desc;`;
+
+      return res;
+    },
   },
 };
 
 function getPassHash(pass: string) {
   return createHash("SHA256")
+    .update(pass)
     .update(process.env.APP_KEY ?? "a key")
     .digest("base64");
 }
