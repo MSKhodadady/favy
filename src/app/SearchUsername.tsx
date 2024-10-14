@@ -14,7 +14,7 @@ export function SearchUsername() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [userSearchResults, setUserSearchResults] = useState(
-    [] as { avatarLink?: string; username: string }[]
+    [] as { avatarLink: string | null; username: string }[]
   );
 
   const doSearchUsers = useDebouncedCallback((q: string) => {
