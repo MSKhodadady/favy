@@ -32,13 +32,18 @@ export const dbTransactions = {
         select: {
           id: true,
           username: true,
-          email: true,
           avatar: true,
         },
         take: 5,
       });
 
-      return res;
+      return Promise.all(
+        res.map(async (i) => ({
+          id: i.id,
+          username: i.username,
+          avatarLink: i.avatar && (await s3Helper.getLink(i.avatar)),
+        }))
+      );
     },
     async createUser(ri: RegisterInput) {
       const { email, password, username } = ri;
@@ -57,6 +62,14 @@ export const dbTransactions = {
 
       return res;
     },
+    async unCreateUser(userId: string) {
+      try {
+        await prisma.user.delete({
+          where: { id: userId },
+        });
+      } catch (error) {}
+    },
+
     async findUserByEmail(email: string) {
       const res = await prisma.user.findFirst({
         where: { email },
@@ -304,8 +317,19 @@ export const dbTransactions = {
 };
 
 function getPassHash(pass: string) {
-  return createHash("SHA256")
-    .update(pass)
-    .update(process.env.APP_KEY ?? "a key")
-    .digest("base64");
+  const passHashKey = process.env.PASS_HASH_KEY ?? "";
+  return createHash("SHA256").update(pass).update(passHashKey).digest("base64");
+}
+
+export function dbIsUniqueError(error: any) {
+  if (error?.code == "P2002") {
+    const target = error?.meta?.target;
+    if (Array.isArray(target) && target.length > 1) {
+      return { res: true, target: target[0] };
+    } else {
+      return { res: true, target: null };
+    }
+  } else {
+    return { res: false };
+  }
 }

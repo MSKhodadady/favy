@@ -1,4 +1,4 @@
-import { userApi } from "@/src/api/user";
+import { dbTransactions } from "@/src/lib/server/db";
 import { verifyToken } from "@/src/lib/server/tokenService";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -41,11 +41,7 @@ export default async function VerifyRegistrationPage({
 
   try {
     //: set user verified
-    const r = await userApi.setVerified(res.email);
-
-    if (r == "user-not-exist") {
-      return <>کاربری با این ایمیل وجود ندارد.</>;
-    }
+    await dbTransactions.user.setVerified(res.email);
 
     return (
       <SignLayout title="ثبت نام با موفقیت تایید شد">

@@ -37,13 +37,15 @@ function S3Helper() {
 
   const folderName = envConfig.STORAGE_S3_ROOT;
 
+  const fn = (f: string) => folderName + f;
+
   return {
     async uploadFile(f: File, fileName: string) {
       await client.send(
         new PutObjectCommand({
           Bucket: bucketName,
           Body: f,
-          Key: folderName + fileName,
+          Key: fn(fileName),
         })
       );
     },
@@ -51,20 +53,27 @@ function S3Helper() {
     async deleteFile(fileName: string) {
       await client.send(
         new DeleteObjectCommand({
-          Key: folderName + fileName,
+          Key: fn(fileName),
           Bucket: bucketName,
         })
       );
     },
 
     async getLink(fileName: string) {
-      return await getSignedUrl(
-        client,
-        new GetObjectCommand({
-          Key: folderName + fileName,
-          Bucket: bucketName,
-        })
-      );
+      try {
+        const link = await getSignedUrl(
+          client,
+          new GetObjectCommand({
+            Key: fn(fileName),
+            Bucket: bucketName,
+          })
+        );
+
+        return link;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
     },
   };
 }

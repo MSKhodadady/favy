@@ -1,6 +1,5 @@
 import {
   createItem,
-  createUser as dCreateUser,
   deleteFile,
   deleteItem,
   login,
@@ -8,21 +7,18 @@ import {
   readMe,
   readUsers,
   updateMe,
-  updateUser,
   uploadFiles,
 } from "@directus/sdk";
-import { RegisterInput } from "../app/(sign)/sign-up/page";
 import {
   directusPublicClient,
   directusServerClient,
   directusUserClient,
   directusUserClientRequestWithAuthCookie,
-  getDirectusFileLink,
 } from "../lib/server/directusClient";
 import { getUserDescLimit } from "../lib/server/envGetter";
 
 export const userApi = {
-  async searchUsername(
+  /* async searchUsername(
     q: string
   ): Promise<{ avatarLink?: string; username: string }[]> {
     const res = await directusPublicClient.request(
@@ -41,9 +37,9 @@ export const userApi = {
       username: i.username,
       avatarLink: i.avatar == null ? undefined : getDirectusFileLink(i.avatar),
     }));
-  },
+  }, */
 
-  async createUser(ri: RegisterInput) {
+  /* async createUser(ri: RegisterInput) {
     return directusServerClient.request(
       dCreateUser({
         email: ri.email,
@@ -52,7 +48,7 @@ export const userApi = {
         username: ri.username,
       })
     );
-  },
+  }, */
 
   async findUserByEmail(email: string, fields = ["*"]) {
     const users = await directusServerClient.request(
@@ -66,7 +62,7 @@ export const userApi = {
     return users.length == 0 ? null : users[0];
   },
 
-  async setVerified(email: string) {
+  /* async setVerified(email: string) {
     const user = await this.findUserByEmail(email);
 
     if (user == null) return "user-not-exist";
@@ -77,7 +73,7 @@ export const userApi = {
         email_verified: true,
       })
     );
-  },
+  }, */
 
   async loginEmail(email: string, password: string) {
     return directusUserClient.request(login(email, password));
