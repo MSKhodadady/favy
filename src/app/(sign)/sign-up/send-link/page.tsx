@@ -33,10 +33,14 @@ export default function SendAgainVerificationLinkPage() {
               showAlertTimeout("کاربری با این ایمیل ثبت نام نکرده است.");
               break;
 
-            case "success":
-              router.push("/sign-up/success");
+            case "verified;":
+              showAlertTimeout("کاربر قبلا تایید شده است.", "success");
+              router.push("/sign-in");
+              break;
 
             case "success":
+              router.push("/sign-up/success");
+              break;
 
             default:
               break;

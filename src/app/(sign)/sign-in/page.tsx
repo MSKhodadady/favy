@@ -36,9 +36,9 @@ export default function LoginPage() {
           showAlertTimeout("ایمیل یا پسورد اشتباه است.");
           break;
 
-        case "email-not-verified":
-          showAlertTimeout("ایمیل شما هنوز تایید نشده است.");
-          break;
+        // case "email-not-verified":
+        //   showAlertTimeout("ایمیل شما هنوز تایید نشده است.");
+        //   break;
 
         case "server-error":
           showAlertTimeout("خطای سرور", "warning");

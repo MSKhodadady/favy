@@ -2,7 +2,6 @@ import {
   createItem,
   deleteFile,
   deleteItem,
-  login,
   readItems,
   readMe,
   readUsers,
@@ -12,7 +11,6 @@ import {
 import {
   directusPublicClient,
   directusServerClient,
-  directusUserClient,
   directusUserClientRequestWithAuthCookie,
 } from "../lib/server/directusClient";
 import { getUserDescLimit } from "../lib/server/envGetter";
@@ -50,7 +48,7 @@ export const userApi = {
     );
   }, */
 
-  async findUserByEmail(email: string, fields = ["*"]) {
+  /* async findUserByEmail(email: string, fields = ["*"]) {
     const users = await directusServerClient.request(
       readUsers({
         fields,
@@ -60,7 +58,7 @@ export const userApi = {
       })
     );
     return users.length == 0 ? null : users[0];
-  },
+  }, */
 
   /* async setVerified(email: string) {
     const user = await this.findUserByEmail(email);
@@ -75,9 +73,9 @@ export const userApi = {
     );
   }, */
 
-  async loginEmail(email: string, password: string) {
+  /* async loginEmail(email: string, password: string) {
     return directusUserClient.request(login(email, password));
-  },
+  }, */
 
   async findUserByUsername(username: string, fields = ["username"]) {
     const users = await directusPublicClient.request(

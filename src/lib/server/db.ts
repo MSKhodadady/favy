@@ -73,7 +73,7 @@ export const dbTransactions = {
     async findUserByEmail(email: string) {
       const res = await prisma.user.findFirst({
         where: { email },
-        select: { id: true, username: true, email: true },
+        select: { id: true, username: true, email: true, email_verified: true },
       });
 
       return res;
@@ -97,6 +97,7 @@ export const dbTransactions = {
         where: {
           email,
           password: passHash,
+          email_verified: true,
         },
         select: {
           email: true,
@@ -117,6 +118,7 @@ export const dbTransactions = {
         );
 
         return {
+          username: res.username,
           token,
           expireTime,
         };
