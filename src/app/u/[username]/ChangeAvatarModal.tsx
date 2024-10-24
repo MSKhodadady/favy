@@ -119,8 +119,7 @@ export function ChangeAvatarModal(P: {
               <FontAwesomeIcon
                 icon={faUserPlus}
                 color="white"
-                width="3rem"
-                height="3rem"
+                className="w-6 h-6"
               />
             </button>
           </AvatarPlaceHolder>

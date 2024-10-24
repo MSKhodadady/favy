@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRef } from "react";
 import { deleteMovieFromUserAct } from "./action";
 
-export function MovieDelete(P: { movieId: string }) {
+export function MovieDelete(P: { movieId: number }) {
   const actionChecker = useActionResChecker();
   const modalRef = useRef<ModalHandle>(null);
   return (
@@ -30,7 +30,8 @@ export function MovieDelete(P: { movieId: string }) {
             className="btn btn-primary"
             onClick={async () => {
               actionChecker({
-                res: await deleteMovieFromUserAct(P.movieId),
+                //: FIXME:
+                res: await deleteMovieFromUserAct("---ERROR---"),
                 onSuccess() {
                   return;
                 },

@@ -69,7 +69,6 @@ export const dbTransactions = {
         });
       } catch (error) {}
     },
-
     async findUserByEmail(email: string) {
       const res = await prisma.user.findFirst({
         where: { email },
@@ -135,6 +134,11 @@ export const dbTransactions = {
           username: true,
           avatar: true,
           favMovies: {
+            where: {
+              movie: {
+                admin_accepted: true,
+              },
+            },
             select: {
               movie: true,
             },

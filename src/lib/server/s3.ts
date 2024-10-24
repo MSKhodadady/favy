@@ -25,7 +25,7 @@ function S3Helper() {
 
   const client = new S3Client({
     region: "default",
-    endpoint: envConfig.STORAGE_S3_ENDPOINT,
+    endpoint: "https://" + envConfig.STORAGE_S3_ENDPOINT,
 
     credentials: {
       accessKeyId: envConfig.STORAGE_S3_KEY!,
@@ -37,7 +37,7 @@ function S3Helper() {
 
   const folderName = envConfig.STORAGE_S3_ROOT;
 
-  const fn = (f: string) => folderName + f;
+  const fn = (f: string) => `${folderName}/${f}`;
 
   return {
     async uploadFile(f: File, fileName: string) {
@@ -58,7 +58,11 @@ function S3Helper() {
         })
       );
     },
-
+    getPublicLink(fileName: string) {
+      return `https://${envConfig.STORAGE_S3_BUCKET}.${
+        envConfig.STORAGE_S3_ENDPOINT
+      }/${folderName}/${encodeURIComponent(fileName)}`;
+    },
     async getLink(fileName: string) {
       try {
         const link = await getSignedUrl(

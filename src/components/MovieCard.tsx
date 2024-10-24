@@ -1,13 +1,12 @@
-import { getDirectusFileLink } from "@/src/lib/server/directusClient";
 import Image from "next/image";
 import { MovieDelete } from "../app/u/[username]/MovieDelete";
 
 export function MovieCard(P: {
-  id: string;
-  posterLink: string;
+  id: number;
+  posterLink: string | null;
   name: string;
-  startYear?: string;
-  endYear: string;
+  startYear: number | null;
+  endYear: number;
   loggedIn: boolean;
 }) {
   return (
@@ -16,15 +15,19 @@ export function MovieCard(P: {
         P.loggedIn ? "rounded-bl-3xl" : ""
       }`}
     >
-      <div className="bg-white w-32 h-auto relative me-3">
-        <Image
-          src={getDirectusFileLink(P.posterLink)}
-          alt={`"${P.name}" poster`}
-          title={`"${P.name}" poster`}
-          width={100}
-          height={100}
-          className="rounded-lg"
-        />
+      <div className="bg-white w-32 h-48 relative me-3 ">
+        {P.posterLink ? (
+          <Image
+            src={P.posterLink}
+            alt={`"${P.name}" poster`}
+            title={`"${P.name}" poster`}
+            width={100}
+            height={100}
+            className="w-full h-full rounded-lg object-cover"
+          />
+        ) : (
+          <div className="bg-primary w-32 h-48 rounded-lg" />
+        )}
       </div>
       <div className="flex flex-col justify-around">
         <div className="text-2xl">{P.name}</div>

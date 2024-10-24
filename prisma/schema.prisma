@@ -16,7 +16,7 @@ model Movie {
   endYear        Int        @map("end_year")
   other_info     Json       @default("{}") @db.Json
   admin_accepted Boolean?   @default(false)
-  poster         String?    @db.Uuid
+  poster         String?    @db.VarChar(255)
   creatorUser    User?      @relation(fields: [userCreatedId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "movie_user_created_foreign")
   usersFav       MovieFav[]
 }

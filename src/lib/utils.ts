@@ -47,3 +47,8 @@ export function nanDefaulter(n: any, defaultN: number) {
   const k = Number(n);
   return Number.isNaN(k) ? defaultN : k;
 }
+
+export function logErr(act: string, location: string, err: any) {
+  console.error(`error while [${act}] in [${location}] -- text:`);
+  console.error(err);
+}

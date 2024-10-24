@@ -4,7 +4,7 @@ import AppLogo from "@/public/favy-logo.svg";
 import Image from "next/image";
 import Link from "next/link";
 
-import { yamaLogo } from "../lib/client/assets";
+import { YamaLogo } from "../components/AppLogo";
 import { SearchUsername } from "./SearchUsername";
 
 export default function HomePage() {
@@ -44,10 +44,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center text-white mt-9 mb-3">
-        <div className="me-3">محصولی از</div>
-        <Image src={yamaLogo} alt="yama logo" className="w-7 h-7" />
-      </div>
+      <YamaLogo className="mt-9 mb-3" />
     </div>
   );
 }
