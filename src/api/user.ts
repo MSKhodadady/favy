@@ -2,95 +2,95 @@ import { createItem, readMe } from "@directus/sdk";
 import { directusUserClientRequestWithAuthCookie } from "../lib/server/directusClient";
 
 export const userApi = {
-  /* async searchUsername(
-    q: string
-  ): Promise<{ avatarLink?: string; username: string }[]> {
-    const res = await directusPublicClient.request(
-      readUsers({
-        filter: {
-          username: {
-            _contains: q,
-          },
-        },
-        fields: ["username", "avatar"],
-        limit: 10,
-      })
-    );
+  // async searchUsername(
+  //   q: string
+  // ): Promise<{ avatarLink?: string; username: string }[]> {
+  //   const res = await directusPublicClient.request(
+  //     readUsers({
+  //       filter: {
+  //         username: {
+  //           _contains: q,
+  //         },
+  //       },
+  //       fields: ["username", "avatar"],
+  //       limit: 10,
+  //     })
+  //   );
 
-    return res.map((i) => ({
-      username: i.username,
-      avatarLink: i.avatar == null ? undefined : getDirectusFileLink(i.avatar),
-    }));
-  }, */
+  //   return res.map((i) => ({
+  //     username: i.username,
+  //     avatarLink: i.avatar == null ? undefined : getDirectusFileLink(i.avatar),
+  //   }));
+  // },
 
-  /* async createUser(ri: RegisterInput) {
-    return directusServerClient.request(
-      dCreateUser({
-        email: ri.email,
-        password: ri.password,
-        // @ts-ignore
-        username: ri.username,
-      })
-    );
-  }, */
+  // async createUser(ri: RegisterInput) {
+  //   return directusServerClient.request(
+  //     dCreateUser({
+  //       email: ri.email,
+  //       password: ri.password,
+  //       // @ts-ignore
+  //       username: ri.username,
+  //     })
+  //   );
+  // },
 
-  /* async findUserByEmail(email: string, fields = ["*"]) {
-    const users = await directusServerClient.request(
-      readUsers({
-        fields,
-        filter: {
-          email,
-        },
-      })
-    );
-    return users.length == 0 ? null : users[0];
-  }, */
+  // async findUserByEmail(email: string, fields = ["*"]) {
+  //   const users = await directusServerClient.request(
+  //     readUsers({
+  //       fields,
+  //       filter: {
+  //         email,
+  //       },
+  //     })
+  //   );
+  //   return users.length == 0 ? null : users[0];
+  // },
 
-  /* async setVerified(email: string) {
-    const user = await this.findUserByEmail(email);
+  // async setVerified(email: string) {
+  //   const user = await this.findUserByEmail(email);
 
-    if (user == null) return "user-not-exist";
+  //   if (user == null) return "user-not-exist";
 
-    return directusServerClient.request(
-      updateUser(user["id"], {
-        // @ts-ignore
-        email_verified: true,
-      })
-    );
-  }, */
+  //   return directusServerClient.request(
+  //     updateUser(user["id"], {
+  //       // @ts-ignore
+  //       email_verified: true,
+  //     })
+  //   );
+  // },
 
-  /* async loginEmail(email: string, password: string) {
-    return directusUserClient.request(login(email, password));
-  }, */
+  // async loginEmail(email: string, password: string) {
+  //   return directusUserClient.request(login(email, password));
+  // },
 
-  /* async findUserByUsername(username: string, fields = ["username"]) {
-    const users = await directusPublicClient.request(
-      readUsers({
-        fields,
-        filter: {
-          username,
-        },
-      })
-    );
-    return users.length == 0 ? null : users[0];
-  }, */
+  // async findUserByUsername(username: string, fields = ["username"]) {
+  //   const users = await directusPublicClient.request(
+  //     readUsers({
+  //       fields,
+  //       filter: {
+  //         username,
+  //       },
+  //     })
+  //   );
+  //   return users.length == 0 ? null : users[0];
+  // },
 
   //: for logged in users {
   async getCurrentUser(fields = ["id"]) {
     return await directusUserClientRequestWithAuthCookie(readMe({ fields }));
   },
 
-  /* async changeUserDesc(description: string) {
-    if (description.length > getUserDescLimit()) {
-      throw Error("LONG-DESC");
-    }
+  // async changeUserDesc(description: string) {
+  //   if (description.length > getUserDescLimit()) {
+  //     throw Error("LONG-DESC");
+  //   }
 
-    await directusUserClientRequestWithAuthCookie(
-      updateMe({
-        description: description.trim(),
-      })
-    );
-  }, */
+  //   await directusUserClientRequestWithAuthCookie(
+  //     updateMe({
+  //       description: description.trim(),
+  //     })
+  //   );
+  // },
 
   // async changeAvatar(avatarFile: File) {
   //   const currentUser = await this.getCurrentUser(["avatar"]);

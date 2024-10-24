@@ -121,9 +121,9 @@ export async function createMovieAct(fd: FormData) {
   });
 }
 
-export async function addMovieAct(movieId: string) {
+export async function addMovieAct(movieId: number) {
   return actionCommonErrChecker(async () => {
-    await userApi.addMovie(movieId);
+    await dbTransactions.user.currentUser.addMovie(movieId);
     revalidateUserPage();
     return "success";
   });

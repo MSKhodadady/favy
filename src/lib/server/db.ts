@@ -230,7 +230,7 @@ export const dbTransactions = {
         }
       },
       async addMovie(movieId: number) {
-        const user = await this.getCurrentUserDB({}, true);
+        const user = await this.getCurrentUserDB({ id: true }, true);
 
         if (user == null) return null;
 
@@ -241,7 +241,7 @@ export const dbTransactions = {
           //: user hasn't m in his fav
           user.favMovies.every((i) => i.movieId != m.id) &&
           //: user hasn't max fav
-          user.favMovies.length < USER_MAX_FAV_NUM
+          user.favMovies.length <= USER_MAX_FAV_NUM
         ) {
           await prisma.movieFav.create({
             data: {

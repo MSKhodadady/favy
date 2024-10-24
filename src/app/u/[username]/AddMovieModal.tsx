@@ -137,8 +137,7 @@ export function AddMovieModal() {
             {...i}
             onClick={async () => {
               actionChecker({
-                //: FIXME:
-                res: await addMovieAct("---ERROR---"),
+                res: await addMovieAct(i.id),
                 onSuccess(alertShower, router) {
                   cleanUp();
                   modalRefSearchMovie.current?.closeModal();
