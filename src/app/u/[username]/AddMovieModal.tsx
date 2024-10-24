@@ -3,8 +3,7 @@
 import { Modal, ModalHandle } from "@/src/components/Modal";
 import { useActionResChecker } from "@/src/lib/client/hooks/useActionResChecker";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
-import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
-import { POSTER_MAX_VOLUME } from "@/src/lib/constants";
+import { envUploadFileMaxSize, maxFileSizeStr } from "@/src/lib/envLoader";
 import { faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
@@ -39,17 +38,14 @@ export function AddMovieModal() {
   const [searchResults, setSearchResults] = useState(
     [] as MovieSearchRowData[]
   );
-  const [showAddNewBtn, setShowAddNewBtn] = useState(false);
   const [showPosterFileSizeErr, setShowPosterFileSizeErr] = useState(false);
-
-  const { showAlertTimeout } = useShowAlertTimeout();
 
   function onImgAdded(e: ChangeEvent<HTMLInputElement>) {
     const { files } = e.target;
     if (files && files.length > 0) {
       const f = files[0];
 
-      if (f.size > POSTER_MAX_VOLUME) {
+      if (f.size > envUploadFileMaxSize) {
         setShowPosterFileSizeErr(true);
         setTimeout(() => {
           setShowPosterFileSizeErr(false);
@@ -93,7 +89,6 @@ export function AddMovieModal() {
   }
 
   const doSearchText = useDebouncedCallback(async (q: string) => {
-    setShowAddNewBtn(false);
     if (q == "") {
       setSearchResults([]);
       return;
@@ -101,13 +96,11 @@ export function AddMovieModal() {
 
     const res = await searchMovieAct(q);
     setSearchResults(res);
-    setShowAddNewBtn(true);
   }, 1000);
 
   function cleanUp() {
     setSearchResults([]);
     setSearchText("");
-    setShowAddNewBtn(false);
     reset();
     setInputImg(null);
   }
@@ -159,16 +152,14 @@ export function AddMovieModal() {
             />
           ))}
         </div>
-        {showAddNewBtn && (
-          <AddNewButton
-            onClick={() => {
-              modalRefSearchMovie.current?.closeModal();
-              modalRefCreateMovie.current?.showModal();
-              setValue("name", searchText);
-            }}
-            className="mt-3"
-          />
-        )}
+        <AddNewButton
+          onClick={() => {
+            modalRefSearchMovie.current?.closeModal();
+            modalRefCreateMovie.current?.showModal();
+            setValue("name", searchText);
+          }}
+          className="mt-3"
+        />
       </Modal>
       {/* ADD NEW MOVIE MODAL */}
       <Modal ref={modalRefCreateMovie} onBackDropClick={cleanUp}>
@@ -237,7 +228,7 @@ export function AddMovieModal() {
                 : " h-0 py-0 overflow-hidden border-none"
             } transition-all`}
           >
-            حجم فایل انتخابی زیاد است.
+            حجم فایل انتخابی زیاد است (حداکثر {maxFileSizeStr()})
           </div>
           {loading ? (
             <progress className="progress progress-success w-full"></progress>

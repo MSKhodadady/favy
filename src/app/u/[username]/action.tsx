@@ -2,11 +2,11 @@
 
 import {
   AUTH_COOKIE_KEY,
-  USER_AVATAR_MAX_VOLUME,
   USER_DESC_CHART_COUNT,
   USER_DESC_LINE_COUNT,
   USERNAME_COOKIE_KEY,
 } from "@/src/lib/constants";
+import { envUploadFileMaxSize } from "@/src/lib/envLoader";
 import { actionCommonErrChecker } from "@/src/lib/server/actionCommonErrChecker";
 import { getUsernameCookie } from "@/src/lib/server/cookieManager";
 import { dbTransactions } from "@/src/lib/server/db";
@@ -71,7 +71,7 @@ export async function changeUserAvatarAct(fd: FormData) {
     if (avatarFile == null || typeof avatarFile == "string")
       return "bad-req" as const;
 
-    if (avatarFile.size > USER_AVATAR_MAX_VOLUME) return "high-volume" as const;
+    if (avatarFile.size > envUploadFileMaxSize) return "bad-req" as const;
 
     await dbTransactions.user.currentUser.changeAvatar(avatarFile);
 
@@ -98,7 +98,7 @@ export async function createMovieAct(fd: FormData) {
 
     if (
       (poster != null &&
-        (typeof poster == "string" || poster.size > USER_AVATAR_MAX_VOLUME)) ||
+        (typeof poster == "string" || poster.size > envUploadFileMaxSize)) ||
       //
       !name ||
       !isString(name) ||

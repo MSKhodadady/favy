@@ -3,6 +3,8 @@
 import { LoadingBar } from "@/src/components/LoadingBar";
 import { useActionResChecker } from "@/src/lib/client/hooks/useActionResChecker";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
+import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
+import { envUploadFileMaxSize, maxFileSizeStr } from "@/src/lib/envLoader";
 import {
   faPen,
   faTrashCan,
@@ -23,6 +25,7 @@ export function ChangeAvatarModal(P: {
 }) {
   const { withLoading, loading } = useLoading();
   const actionChecker = useActionResChecker();
+  const { showAlertTimeout } = useShowAlertTimeout();
 
   const inputFileRef = useRef<null | HTMLInputElement>(null);
   const dialogChangeRef = useRef<null | HTMLDialogElement>(null);
@@ -35,8 +38,16 @@ export function ChangeAvatarModal(P: {
 
     if (files && files.length > 0) {
       const f = files[0];
-      setInputAvatarImg(f);
 
+      if (f.size > envUploadFileMaxSize) {
+        showAlertTimeout(
+          `حجم فایل انتخابی بسیار بزرگ است (حداکثر ${maxFileSizeStr()})`,
+          "error"
+        );
+        return;
+      }
+
+      setInputAvatarImg(f);
       dialogChangeRef.current?.showModal();
     }
   }
@@ -53,11 +64,6 @@ export function ChangeAvatarModal(P: {
         res: await changeUserAvatarAct(fd),
         onSuccess() {
           dialogChangeRef.current?.close();
-        },
-        onOther(r, alertShower, router) {
-          if (r == "high-volume") {
-            alertShower.showAlertTimeout("حجم فایل زیاد است");
-          }
         },
       });
     });
