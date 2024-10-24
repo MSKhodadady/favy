@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { AUTH_COOKIE_KEY } from "../constants";
 import { USER_MAX_FAV_NUM } from "../envLoader";
 import prisma from "./prisma";
-import s3Helper, { movieFileName, userAvatarFileName } from "./s3";
+import s3Helper, { fileNameGenerator } from "./s3";
 import {
   createToken,
   getLoginTokenExpireTime,
@@ -191,7 +191,7 @@ export const dbTransactions = {
         }
       },
       async changeAvatar(avatarFile: File) {
-        const user = await this.getCurrentUserDB({ avatar: true });
+        const user = await this.getCurrentUserDB({ id: true, avatar: true });
 
         if (user == null) return;
 
@@ -201,7 +201,10 @@ export const dbTransactions = {
           s3Helper.deleteFile(user.avatar);
         }
 
-        const fileName = userAvatarFileName(user.username, avatarFile.name);
+        const fileName = fileNameGenerator.userAvatar(
+          user.username,
+          avatarFile.name
+        );
 
         //: save file to s3
         s3Helper.uploadFile(avatarFile, fileName);
@@ -293,7 +296,7 @@ export const dbTransactions = {
       //: upload file
       if (posterImg) {
         try {
-          const fileName = movieFileName(m.id, posterImg.name);
+          const fileName = fileNameGenerator.moviePoster(m.id, posterImg.name);
           await s3Helper.uploadFile(posterImg, fileName);
           //: set db poster file id
 

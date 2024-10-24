@@ -54,6 +54,11 @@ export function ChangeAvatarModal(P: {
         onSuccess() {
           dialogChangeRef.current?.close();
         },
+        onOther(r, alertShower, router) {
+          if (r == "high-volume") {
+            alertShower.showAlertTimeout("حجم فایل زیاد است");
+          }
+        },
       });
     });
   }

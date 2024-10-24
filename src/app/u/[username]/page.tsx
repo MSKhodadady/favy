@@ -1,7 +1,6 @@
 import { AppLogo, YamaLogo } from "@/src/components/AppLogo";
 import { AUTH_COOKIE_KEY, USERNAME_COOKIE_KEY } from "@/src/lib/constants";
 import { dbTransactions } from "@/src/lib/server/db";
-import { getDirectusFileLink } from "@/src/lib/server/directusClient";
 import s3Helper from "@/src/lib/server/s3";
 import { logErr } from "@/src/lib/utils";
 import { Metadata } from "next";
@@ -96,15 +95,15 @@ export default async function UserPage({
             <ChangeAvatarModal
               avatarId={serverUser.avatar}
               avatarLink={
-                //: FIXME:
-                serverUser.avatar ? getDirectusFileLink("---ERROR---") : null
+                serverUser.avatar
+                  ? s3Helper.getPublicLink(serverUser.avatar)
+                  : null
               }
               username={username}
             />
           ) : serverUser.avatar ? (
             <AvatarViewer
-              //: FIXME:
-              avatarLink={getDirectusFileLink("---ERROR---")}
+              avatarLink={s3Helper.getPublicLink(serverUser.avatar)}
               username={username}
             />
           ) : (

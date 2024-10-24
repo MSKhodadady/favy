@@ -44,7 +44,7 @@ function S3Helper() {
       await client.send(
         new PutObjectCommand({
           Bucket: bucketName,
-          Body: f,
+          Body: Buffer.from(await f.arrayBuffer()),
           Key: fn(fileName),
         })
       );
@@ -86,14 +86,15 @@ const s3Helper = S3Helper();
 
 export default s3Helper;
 
-export function userAvatarFileName(username: string, uploadedFileName: string) {
-  return `avatar_u(${username})_t(${Math.floor(
-    Date.now() / 1000
-  )}).${getFileNameExt(uploadedFileName)}`;
-}
-
-export function movieFileName(movieId: number, uploadedFileName: string) {
-  return `movie_id(${String(movieId)})_t(${Math.floor(
-    Date.now() / 1000
-  )}).${getFileNameExt(uploadedFileName)}`;
-}
+export const fileNameGenerator = {
+  userAvatar(username: string, uploadedFileName: string) {
+    return `avatar_u(${username})_t(${Math.floor(
+      Date.now() / 1000
+    )}).${getFileNameExt(uploadedFileName)}`;
+  },
+  moviePoster(movieId: number, uploadedFileName: string) {
+    return `movie_id(${String(movieId)})_t(${Math.floor(
+      Date.now() / 1000
+    )}).${getFileNameExt(uploadedFileName)}`;
+  },
+};

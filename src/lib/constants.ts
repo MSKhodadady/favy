@@ -5,3 +5,5 @@ export const USERNAME_COOKIE_KEY = "favy_username";
 export const USER_DESC_LINE_COUNT = 4;
 
 export const USER_DESC_CHART_COUNT = 180;
+
+export const USER_AVATAR_MAX_VOLUME = 1024 * 1024 * 20; //: 20 Mega Bytes

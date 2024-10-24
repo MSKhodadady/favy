@@ -4,6 +4,7 @@ import { moviesApi } from "@/src/api/movies";
 import { userApi } from "@/src/api/user";
 import {
   AUTH_COOKIE_KEY,
+  USER_AVATAR_MAX_VOLUME,
   USER_DESC_CHART_COUNT,
   USER_DESC_LINE_COUNT,
   USERNAME_COOKIE_KEY,
@@ -63,16 +64,19 @@ export async function changeUserDescAct(description: string) {
 }
 
 export async function changeUserAvatarAct(fd: FormData) {
-  const avatarFile = fd.get("avatar-img");
-
-  if (avatarFile == null || typeof avatarFile == "string") return "bad-req";
-
   return actionCommonErrChecker(async () => {
-    await userApi.changeAvatar(avatarFile);
+    const avatarFile = fd.get("avatar-img");
+
+    if (avatarFile == null || typeof avatarFile == "string")
+      return "bad-req" as const;
+
+    if (avatarFile.size > USER_AVATAR_MAX_VOLUME) return "high-volume" as const;
+
+    await dbTransactions.user.currentUser.changeAvatar(avatarFile);
 
     revalidateUserPage();
 
-    return "success";
+    return "success" as const;
   });
 }
 
