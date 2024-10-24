@@ -1,4 +1,4 @@
-import { createItem, deleteItem, readItems, readMe } from "@directus/sdk";
+import { createItem, readMe } from "@directus/sdk";
 import { directusUserClientRequestWithAuthCookie } from "../lib/server/directusClient";
 
 export const userApi = {
@@ -138,27 +138,27 @@ export const userApi = {
     }
   },
 
-  async deleteMovie(movieId: string) {
-    const currentUser = await this.getCurrentUser();
+  // async deleteMovie(movieId: string) {
+  //   const currentUser = await this.getCurrentUser();
 
-    const items = await directusUserClientRequestWithAuthCookie(
-      readItems("MovieFav", {
-        filter: {
-          Movie_id: movieId,
-          user_id: currentUser.id,
-        },
-      })
-    );
+  //   const items = await directusUserClientRequestWithAuthCookie(
+  //     readItems("MovieFav", {
+  //       filter: {
+  //         Movie_id: movieId,
+  //         user_id: currentUser.id,
+  //       },
+  //     })
+  //   );
 
-    if (items.length > 0) {
-      const movieFavItem = items[0];
+  //   if (items.length > 0) {
+  //     const movieFavItem = items[0];
 
-      await directusUserClientRequestWithAuthCookie(
-        deleteItem("MovieFav", movieFavItem.id)
-      );
-    }
+  //     await directusUserClientRequestWithAuthCookie(
+  //       deleteItem("MovieFav", movieFavItem.id)
+  //     );
+  //   }
 
-    return true;
-  },
+  //   return true;
+  // },
   //: }
 };

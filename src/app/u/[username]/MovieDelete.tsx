@@ -30,8 +30,7 @@ export function MovieDelete(P: { movieId: number }) {
             className="btn btn-primary"
             onClick={async () => {
               actionChecker({
-                //: FIXME:
-                res: await deleteMovieFromUserAct("---ERROR---"),
+                res: await deleteMovieFromUserAct(P.movieId),
                 onSuccess() {
                   return;
                 },

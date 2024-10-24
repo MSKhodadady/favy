@@ -126,9 +126,9 @@ export async function addMovieAct(movieId: string) {
   });
 }
 
-export async function deleteMovieFromUserAct(movieId: string) {
+export async function deleteMovieFromUserAct(movieId: number) {
   return actionCommonErrChecker(async () => {
-    const res = await userApi.deleteMovie(movieId);
+    await dbTransactions.user.currentUser.deleteMovie(movieId);
 
     revalidateUserPage();
     return "success";
