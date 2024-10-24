@@ -215,7 +215,7 @@ export const dbTransactions = {
         });
       },
       async deleteAvatar() {
-        const user = await this.getCurrentUserDB({ avatar: true });
+        const user = await this.getCurrentUserDB({ id: true, avatar: true });
 
         if (user == null) return;
 

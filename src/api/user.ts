@@ -1,16 +1,5 @@
-import {
-  createItem,
-  deleteFile,
-  deleteItem,
-  readItems,
-  readMe,
-  updateMe,
-  uploadFiles,
-} from "@directus/sdk";
-import {
-  directusServerClient,
-  directusUserClientRequestWithAuthCookie,
-} from "../lib/server/directusClient";
+import { createItem, deleteItem, readItems, readMe } from "@directus/sdk";
+import { directusUserClientRequestWithAuthCookie } from "../lib/server/directusClient";
 
 export const userApi = {
   /* async searchUsername(
@@ -103,34 +92,34 @@ export const userApi = {
     );
   }, */
 
-  async changeAvatar(avatarFile: File) {
-    const currentUser = await this.getCurrentUser(["avatar"]);
+  // async changeAvatar(avatarFile: File) {
+  //   const currentUser = await this.getCurrentUser(["avatar"]);
 
-    //: delete previous avatar file if exists
-    const { avatar } = currentUser;
-    if (avatar != null) {
-      await directusUserClientRequestWithAuthCookie(updateMe({ avatar: null }));
-      await directusServerClient.request(deleteFile(avatar));
-    }
+  //   //: delete previous avatar file if exists
+  //   const { avatar } = currentUser;
+  //   if (avatar != null) {
+  //     await directusUserClientRequestWithAuthCookie(updateMe({ avatar: null }));
+  //     await directusServerClient.request(deleteFile(avatar));
+  //   }
 
-    //:
-    const fd = new FormData();
-    fd.append("file", avatarFile);
-    const f = await directusServerClient.request(uploadFiles(fd));
+  //   //:
+  //   const fd = new FormData();
+  //   fd.append("file", avatarFile);
+  //   const f = await directusServerClient.request(uploadFiles(fd));
 
-    //:
-    await directusUserClientRequestWithAuthCookie(updateMe({ avatar: f.id }));
-  },
+  //   //:
+  //   await directusUserClientRequestWithAuthCookie(updateMe({ avatar: f.id }));
+  // },
 
-  async deleteAvatar() {
-    const currentUser = await this.getCurrentUser(["avatar"]);
+  // async deleteAvatar() {
+  //   const currentUser = await this.getCurrentUser(["avatar"]);
 
-    const { avatar } = currentUser;
-    if (avatar != null) {
-      await directusUserClientRequestWithAuthCookie(updateMe({ avatar: null }));
-      await directusServerClient.request(deleteFile(avatar));
-    }
-  },
+  //   const { avatar } = currentUser;
+  //   if (avatar != null) {
+  //     await directusUserClientRequestWithAuthCookie(updateMe({ avatar: null }));
+  //     await directusServerClient.request(deleteFile(avatar));
+  //   }
+  // },
 
   async addMovie(movieId: string) {
     const currentUser = await this.getCurrentUser(["id", "fav_movie.Movie_id"]);

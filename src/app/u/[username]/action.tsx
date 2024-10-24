@@ -82,7 +82,7 @@ export async function changeUserAvatarAct(fd: FormData) {
 
 export async function deleteUserAvatarAct() {
   return actionCommonErrChecker(async () => {
-    await userApi.deleteAvatar();
+    await dbTransactions.user.currentUser.deleteAvatar();
     revalidateUserPage();
 
     return "success";
