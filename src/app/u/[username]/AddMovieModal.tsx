@@ -137,7 +137,8 @@ export function AddMovieModal() {
             {...i}
             onClick={async () => {
               actionChecker({
-                res: await addMovieAct(i.id),
+                //: FIXME:
+                res: await addMovieAct("---ERROR---"),
                 onSuccess(alertShower, router) {
                   cleanUp();
                   modalRefSearchMovie.current?.closeModal();
@@ -244,10 +245,10 @@ function AddNewButton(P: { onClick: () => void; className?: string }) {
 }
 
 type MovieSearchRowData = {
-  id: string;
-  posterLink?: string;
+  id: number;
+  posterLink: string | null;
   name: string;
-  endYear: string;
+  endYear: number;
 };
 function MovieSearchRow(P: MovieSearchRowData & { onClick: () => void }) {
   return (

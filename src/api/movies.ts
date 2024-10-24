@@ -1,4 +1,4 @@
-import { createItem, readItem, readItems, uploadFiles } from "@directus/sdk";
+import { createItem, readItem, uploadFiles } from "@directus/sdk";
 import {
   directusPublicClient,
   directusServerClient,
@@ -50,18 +50,18 @@ export const moviesApi = {
     return movie;
   },
 
-  async searchMovie(
-    query: string,
-    fields = ["id", "Name", "end_year", "poster"]
-  ) {
-    const res = await directusPublicClient.request(
-      readItems("Movie", {
-        search: query,
-        limit: 10,
-        fields,
-      })
-    );
+  // async searchMovie(
+  //   query: string,
+  //   fields = ["id", "Name", "end_year", "poster"]
+  // ) {
+  //   const res = await directusPublicClient.request(
+  //     readItems("Movie", {
+  //       search: query,
+  //       limit: 10,
+  //       fields,
+  //     })
+  //   );
 
-    return res;
-  },
+  //   return res;
+  // },
 };

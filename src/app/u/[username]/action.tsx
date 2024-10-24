@@ -12,7 +12,7 @@ import {
 import { actionCommonErrChecker } from "@/src/lib/server/actionCommonErrChecker";
 import { getUsernameCookie } from "@/src/lib/server/cookieManager";
 import { dbTransactions } from "@/src/lib/server/db";
-import { getDirectusFileLink } from "@/src/lib/server/directusClient";
+import s3Helper from "@/src/lib/server/s3";
 import { isString } from "@/src/lib/utils";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
@@ -23,13 +23,16 @@ function revalidateUserPage() {
 }
 
 export async function searchMovieAct(q: string) {
-  const res = await moviesApi.searchMovie(q);
-  return res.map((i) => ({
-    id: i.id,
-    name: i.Name,
-    endYear: i.end_year,
-    posterLink: getDirectusFileLink(i.poster),
+  const res = await dbTransactions.movie.searchMovie(q);
+
+  const newRes = res.map(({ id, name, end_year, poster }) => ({
+    id,
+    name,
+    endYear: end_year,
+    posterLink: poster ? s3Helper.getPublicLink(poster) : null,
   }));
+
+  return newRes;
 }
 
 //: NEED LOGIN ACTION ---------------------------------------------------------

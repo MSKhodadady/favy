@@ -1,5 +1,4 @@
 import { RegisterInput } from "@/src/app/(sign)/sign-up/page";
-import { Movie } from "@prisma/client";
 import { createHash } from "crypto";
 import { cookies } from "next/headers";
 import { AUTH_COOKIE_KEY } from "../constants";
@@ -310,9 +309,15 @@ export const dbTransactions = {
       }
     },
     async searchMovie(query: string) {
-      const res: Movie & { sim: number } = await prisma.$queryRaw`
+      const res: {
+        id: number;
+        name: string;
+        end_year: number;
+        poster: string | null;
+        sim: number;
+      }[] = await prisma.$queryRaw`
         SELECT
-          *,
+          "id", "end_year", "poster", "name",
           SIMILARITY(
             concat("name", coalesce ("start_year"::text, ''), "end_year"),
             ${query}
