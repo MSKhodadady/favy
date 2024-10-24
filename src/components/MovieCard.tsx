@@ -11,11 +11,11 @@ export function MovieCard(P: {
 }) {
   return (
     <div
-      className={`bg-white rounded-lg flex p-3 relative ${
+      className={`bg-white rounded-lg flex p-3 relative  ${
         P.loggedIn ? "rounded-bl-3xl" : ""
       }`}
     >
-      <div className="bg-white w-32 h-48 relative me-3 ">
+      <div className="bg-white w-32 h-48 relative me-3 shadow-sm rounded-lg overflow-clip">
         {P.posterLink ? (
           <Image
             src={P.posterLink}
@@ -23,10 +23,10 @@ export function MovieCard(P: {
             title={`"${P.name}" poster`}
             width={100}
             height={100}
-            className="w-full h-full rounded-lg object-cover"
+            className="w-full h-full  object-cover"
           />
         ) : (
-          <div className="bg-primary w-32 h-48 rounded-lg" />
+          <div className="bg-primary w-32 h-48 " />
         )}
       </div>
       <div className="flex flex-col justify-around">

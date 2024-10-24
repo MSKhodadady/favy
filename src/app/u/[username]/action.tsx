@@ -1,7 +1,5 @@
 "use server";
 
-import { moviesApi } from "@/src/api/movies";
-import { userApi } from "@/src/api/user";
 import {
   AUTH_COOKIE_KEY,
   USER_AVATAR_MAX_VOLUME,
@@ -93,31 +91,42 @@ export async function deleteUserAvatarAct() {
 }
 
 export async function createMovieAct(fd: FormData) {
-  const cks = cookies().get(AUTH_COOKIE_KEY)?.value;
-  if (!cks) return "no-user";
-
-  const name = fd.get("name");
-  const year = fd.get("year");
-  const poster = fd.get("poster");
-
-  if (
-    (poster != null && typeof poster == "string") ||
-    !name ||
-    !isString(name) ||
-    !year ||
-    !isString(year)
-  ) {
-    return "bad-req";
-  }
-
   return actionCommonErrChecker(async () => {
-    const movie = await moviesApi.addMovie(name, year, poster);
+    const name = fd.get("name");
+    const year = fd.get("year");
+    const poster = fd.get("poster");
 
-    await userApi.addMovie(movie.id);
+    if (
+      (poster != null &&
+        (typeof poster == "string" || poster.size > USER_AVATAR_MAX_VOLUME)) ||
+      //
+      !name ||
+      !isString(name) ||
+      //
+      !year ||
+      !isString(year) ||
+      Number.isNaN(Number(year))
+    ) {
+      return "bad-req";
+    }
+
+    const movie = await dbTransactions.movie.addMovie(
+      name,
+      Number(year),
+      poster
+    );
+
+    if (movie == null) return "log-out";
+
+    await dbTransactions.user.currentUser.addMovie(movie.id);
 
     revalidateUserPage();
 
-    return "success";
+    if (movie.message == "movie-exists") {
+      return "movie-exists";
+    } else {
+      return "success";
+    }
   });
 }
 

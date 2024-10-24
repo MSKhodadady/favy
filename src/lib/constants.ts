@@ -6,4 +6,6 @@ export const USER_DESC_LINE_COUNT = 4;
 
 export const USER_DESC_CHART_COUNT = 180;
 
-export const USER_AVATAR_MAX_VOLUME = 1024 * 1024 * 20; //: 20 Mega Bytes
+export const USER_AVATAR_MAX_VOLUME = 1024 * 1024 * 10; //: 10 Mega Bytes
+
+export const POSTER_MAX_VOLUME = 1024 * 1024 * 10; //: 10 Mega Bytes

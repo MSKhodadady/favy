@@ -277,18 +277,25 @@ export const dbTransactions = {
 
       return m;
     },
-    async addMovie(
-      name: string,
-      endYear: number,
-      posterImg?: File,
-      startYear?: number
-    ) {
+    async addMovie(name: string, endYear: number, posterImg: File | null) {
+      const user = await dbTransactions.user.currentUser.getCurrentUser();
+      if (user == null) return null;
+
+      const preM = await prisma.movie.findFirst({
+        where: { name },
+      });
+
+      if (preM != null) {
+        return { id: 1, message: "movie-exists" as const };
+      }
+
       //: db
       const m = await prisma.movie.create({
         data: {
           endYear,
-          startYear,
           name,
+          userCreatedId: user.id,
+          dateCreated: new Date(),
         },
       });
 
@@ -303,10 +310,17 @@ export const dbTransactions = {
             where: { id: m.id },
             data: { poster: fileName },
           });
+
+          return { id: m.id };
         } catch (error) {
-          console.error(error);
+          //: roll back db
+          await prisma.movie.delete({
+            where: { id: m.id },
+          });
+
+          throw error;
         }
-      }
+      } else return { id: m.id };
     },
     async searchMovie(query: string) {
       const res: {
@@ -323,6 +337,7 @@ export const dbTransactions = {
             ${query}
           ) as sim
         FROM "Movie"
+        where "admin_accepted"
         order by sim desc;`;
 
       return res;

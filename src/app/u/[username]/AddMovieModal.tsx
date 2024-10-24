@@ -3,6 +3,8 @@
 import { Modal, ModalHandle } from "@/src/components/Modal";
 import { useActionResChecker } from "@/src/lib/client/hooks/useActionResChecker";
 import { useLoading } from "@/src/lib/client/hooks/useLoading";
+import { useShowAlertTimeout } from "@/src/lib/client/hooks/useShowAlert";
+import { POSTER_MAX_VOLUME } from "@/src/lib/constants";
 import { faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
@@ -29,6 +31,7 @@ export function AddMovieModal() {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<AddMovie>();
 
   const [inputImg, setInputImg] = useState(null as null | File);
@@ -37,11 +40,23 @@ export function AddMovieModal() {
     [] as MovieSearchRowData[]
   );
   const [showAddNewBtn, setShowAddNewBtn] = useState(false);
+  const [showPosterFileSizeErr, setShowPosterFileSizeErr] = useState(false);
+
+  const { showAlertTimeout } = useShowAlertTimeout();
 
   function onImgAdded(e: ChangeEvent<HTMLInputElement>) {
     const { files } = e.target;
     if (files && files.length > 0) {
       const f = files[0];
+
+      if (f.size > POSTER_MAX_VOLUME) {
+        setShowPosterFileSizeErr(true);
+        setTimeout(() => {
+          setShowPosterFileSizeErr(false);
+        }, 2000);
+        return;
+      }
+
       setInputImg(f);
     }
   }
@@ -51,7 +66,9 @@ export function AddMovieModal() {
     fd.append("name", name);
     fd.append("year", year);
 
-    if (inputImg != null) fd.append("poster", inputImg);
+    if (inputImg != null) {
+      fd.append("poster", inputImg);
+    }
 
     withLoading(async () => {
       actionChecker({
@@ -65,11 +82,10 @@ export function AddMovieModal() {
           cleanUp();
         },
         onOther(r, alertShower, router) {
-          if (r == "no-user") {
-            alertShower.showMustLogin();
-            router.push("/sign-in");
-          } else {
-            alertShower.showInternalErr();
+          if (r == "movie-exists") {
+            alertShower.showAlertTimeout("فیلم ثبت شد", "success");
+            modalRefCreateMovie.current?.closeModal();
+            cleanUp();
           }
         },
       });
@@ -78,19 +94,14 @@ export function AddMovieModal() {
 
   const doSearchText = useDebouncedCallback(async (q: string) => {
     setShowAddNewBtn(false);
-
     if (q == "") {
       setSearchResults([]);
       return;
     }
 
     const res = await searchMovieAct(q);
-
     setSearchResults(res);
-
-    if (res.length == 0) {
-      setShowAddNewBtn(true);
-    }
+    setShowAddNewBtn(true);
   }, 1000);
 
   function cleanUp() {
@@ -116,8 +127,8 @@ export function AddMovieModal() {
       {/* SEARCH MOVIE MODAL */}
       <Modal
         ref={modalRefSearchMovie}
-        className="h-2/3"
         onBackDropClick={cleanUp}
+        className=" flex flex-col max-h-screen"
       >
         <input
           type="text"
@@ -131,26 +142,29 @@ export function AddMovieModal() {
           }}
         />
 
-        {searchResults.map((i) => (
-          <MovieSearchRow
-            key={i.id}
-            {...i}
-            onClick={async () => {
-              actionChecker({
-                res: await addMovieAct(i.id),
-                onSuccess(alertShower, router) {
-                  cleanUp();
-                  modalRefSearchMovie.current?.closeModal();
-                },
-              });
-            }}
-          />
-        ))}
+        <div className="h-96 overflow-y-auto">
+          {searchResults.map((i) => (
+            <MovieSearchRow
+              key={i.id}
+              {...i}
+              onClick={async () => {
+                actionChecker({
+                  res: await addMovieAct(i.id),
+                  onSuccess(alertShower, router) {
+                    cleanUp();
+                    modalRefSearchMovie.current?.closeModal();
+                  },
+                });
+              }}
+            />
+          ))}
+        </div>
         {showAddNewBtn && (
           <AddNewButton
             onClick={() => {
               modalRefSearchMovie.current?.closeModal();
               modalRefCreateMovie.current?.showModal();
+              setValue("name", searchText);
             }}
             className="mt-3"
           />
@@ -161,7 +175,7 @@ export function AddMovieModal() {
         <form onSubmit={handleSubmit(onCreateMovieFormSubmit)}>
           <div className="flex w-full">
             {inputImg ? (
-              <div className="min-w-28 w-28 h-44 overflow-hidden rounded-lg">
+              <div className="w-32 h-48 overflow-hidden rounded-lg">
                 <Image
                   src={URL.createObjectURL(inputImg)}
                   width={2800}
@@ -173,7 +187,7 @@ export function AddMovieModal() {
             ) : (
               <button
                 type="button"
-                className="btn btn-outline text-primary min-w-28 w-28 h-44 hover:text-primary active:text-primary"
+                className="btn btn-outline text-primary w-32 h-48 hover:text-primary active:text-primary"
                 onClick={() => {
                   inputRefMoviePosterImgFile.current?.click();
                 }}
@@ -214,6 +228,16 @@ export function AddMovieModal() {
                 ref={inputRefMoviePosterImgFile}
               />
             </div>
+          </div>
+
+          <div
+            className={`alert alert-error mt-3 ${
+              showPosterFileSizeErr
+                ? ""
+                : " h-0 py-0 overflow-hidden border-none"
+            } transition-all`}
+          >
+            حجم فایل انتخابی زیاد است.
           </div>
           {loading ? (
             <progress className="progress progress-success w-full"></progress>
