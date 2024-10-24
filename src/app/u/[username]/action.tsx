@@ -2,9 +2,15 @@
 
 import { moviesApi } from "@/src/api/movies";
 import { userApi } from "@/src/api/user";
-import { AUTH_COOKIE_KEY, USERNAME_COOKIE_KEY } from "@/src/lib/constants";
+import {
+  AUTH_COOKIE_KEY,
+  USER_DESC_CHART_COUNT,
+  USER_DESC_LINE_COUNT,
+  USERNAME_COOKIE_KEY,
+} from "@/src/lib/constants";
 import { actionCommonErrChecker } from "@/src/lib/server/actionCommonErrChecker";
 import { getUsernameCookie } from "@/src/lib/server/cookieManager";
+import { dbTransactions } from "@/src/lib/server/db";
 import { getDirectusFileLink } from "@/src/lib/server/directusClient";
 import { isString } from "@/src/lib/utils";
 import { revalidatePath } from "next/cache";
@@ -36,17 +42,21 @@ export async function signOutAct() {
 
 export async function changeUserDescAct(description: string) {
   return actionCommonErrChecker(async () => {
+    const _desc = description.trim();
+    if (
+      _desc.length > USER_DESC_CHART_COUNT ||
+      _desc.split("\n").length > USER_DESC_LINE_COUNT
+    ) {
+      return "long-desc";
+    }
+
     try {
-      await userApi.changeUserDesc(description);
+      await dbTransactions.user.currentUser.changeUserDesc(_desc);
 
       revalidateUserPage();
 
       return "success";
     } catch (error: any) {
-      if (error?.message == "LONG-DESC") {
-        return "long-desc";
-      }
-
       throw error;
     }
   });

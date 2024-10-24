@@ -4,16 +4,13 @@ import {
   deleteItem,
   readItems,
   readMe,
-  readUsers,
   updateMe,
   uploadFiles,
 } from "@directus/sdk";
 import {
-  directusPublicClient,
   directusServerClient,
   directusUserClientRequestWithAuthCookie,
 } from "../lib/server/directusClient";
-import { getUserDescLimit } from "../lib/server/envGetter";
 
 export const userApi = {
   /* async searchUsername(
@@ -77,7 +74,7 @@ export const userApi = {
     return directusUserClient.request(login(email, password));
   }, */
 
-  async findUserByUsername(username: string, fields = ["username"]) {
+  /* async findUserByUsername(username: string, fields = ["username"]) {
     const users = await directusPublicClient.request(
       readUsers({
         fields,
@@ -87,14 +84,14 @@ export const userApi = {
       })
     );
     return users.length == 0 ? null : users[0];
-  },
+  }, */
 
   //: for logged in users {
   async getCurrentUser(fields = ["id"]) {
     return await directusUserClientRequestWithAuthCookie(readMe({ fields }));
   },
 
-  async changeUserDesc(description: string) {
+  /* async changeUserDesc(description: string) {
     if (description.length > getUserDescLimit()) {
       throw Error("LONG-DESC");
     }
@@ -104,7 +101,7 @@ export const userApi = {
         description: description.trim(),
       })
     );
-  },
+  }, */
 
   async changeAvatar(avatarFile: File) {
     const currentUser = await this.getCurrentUser(["avatar"]);
