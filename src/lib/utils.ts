@@ -1,9 +1,15 @@
 export const matchCase = (m: Record<string, any>, s: string) => m[s];
 
-export const passwordPattern =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/;
+export const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+export const passwordPatternError =
+  "حداقل ۸ حرف شامل حرف بزرگ انگلیسی، حرف کوچک و عدد انگلیسی";
 
 export const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,10}$/;
+
+export const usernamePattern =
+  /^(?=.{6,})[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)*$/;
+export const usernamePatternErr =
+  "حداقل ۶ حرف از حروف و عدد انگلیسی و _، شامل بخش های جدا شده با نقطه با یک حرف در آغاز";
 
 export function emailErrorText(errorEmail: any) {
   return matchCase(

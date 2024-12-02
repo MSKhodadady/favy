@@ -8,6 +8,9 @@ import {
   emailPattern,
   matchCase,
   passwordPattern,
+  passwordPatternError,
+  usernamePattern,
+  usernamePatternErr,
 } from "@/src/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -80,14 +83,14 @@ export default function SignPage() {
         <TextInput
           inputProps={register("username", {
             required: true,
-            pattern: /^[A-Za-z_]{8,}$/,
+            pattern: usernamePattern,
           })}
           placeHolder="نام کاربری"
           hasErr={errors.username != null}
           error={matchCase(
             {
               required: "لازم است.",
-              pattern: "نادرست است.",
+              pattern: usernamePatternErr,
               value: errors.username?.message,
               "": "",
             },
@@ -106,11 +109,10 @@ export default function SignPage() {
           error={matchCase(
             {
               required: "لازم است.",
-              pattern:
-                "حداقل ۸ کاراکتر، شامل حرف کوچک انگلیسی، حرف بزرگ انگلیسی، عدد و یکی از نشانه های @$!%*?&_",
-              "": "",
+              pattern: passwordPatternError,
+              unknown: errors.passwordRepeat?.message,
             },
-            errors.password?.type ?? ""
+            errors.password?.type ?? "unknown"
           )}
         />
 
@@ -125,8 +127,7 @@ export default function SignPage() {
           error={matchCase(
             {
               required: "لازم است.",
-              pattern:
-                "حداقل ۸ کاراکتر، شامل حرف کوچک انگلیسی، حرف بزرگ انگلیسی، عدد و یکی از نشانه های @$!%*?&_",
+              pattern: passwordPatternError,
               unknown: errors.passwordRepeat?.message,
             },
             errors.passwordRepeat?.type ?? "unknown"
@@ -144,7 +145,7 @@ export default function SignPage() {
       </form>
 
       <Link
-        className="text-blue-700 pt-3 italic underline underline-offset-8"
+        className="text-center w-full text-blue-700 pt-3 italic underline underline-offset-8"
         href={"/sign-up/send-link"}
       >
         قبلا ثبت نام کردید ولی ایمیل تایید دریافت نکردید.

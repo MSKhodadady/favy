@@ -1,4 +1,5 @@
 import { jwtVerify, SignJWT } from "jose";
+import { nanDefaulter } from "../utils";
 
 const APP_KEY = process.env.APP_KEY!;
 
@@ -42,10 +43,8 @@ export async function verifyToken(token: string) {
 
 export function getLoginTokenExpireTime() {
   const nowSeconds = Math.floor(Date.now() / 1000); //: now epoch in seconds
-  const LOGIN_EXPIRE_TIME_ADD = Number(process.env.LOGIN_EXPIRE_TIME_ADD);
-  const addSeconds = Number.isNaN(LOGIN_EXPIRE_TIME_ADD)
-    ? 86400
-    : LOGIN_EXPIRE_TIME_ADD;
+
+  const addSeconds = nanDefaulter(process.env.LOGIN_EXPIRE_TIME_ADD, 86400);
 
   const expireTime = nowSeconds + addSeconds;
 

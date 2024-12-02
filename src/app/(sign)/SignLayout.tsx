@@ -14,14 +14,14 @@ export function SignLayout(P: {
         background: "linear-gradient(134.68deg, #F3C4C4 0.56%, #D0D0D0 100%)",
       }}
     >
-      <div className="flex-grow flex items-center justify-center">
-        <div className="max-w-md flex flex-col items-stretch rounded-lg p-5 bg-white shadow-2xl">
+      <div className="flex-grow flex items-center justify-center max-w-md w-full">
+        <div className=" w-full flex flex-col items-stretch rounded-lg p-5 bg-white shadow-2xl">
           <Link className="flex justify-center mb-3" href={"/"}>
             <AppLogoWithTitle />
           </Link>
           <hr />
           <h1 className="text-3xl basis-1/2 pb-4 text-start mt-3">{P.title}</h1>
-          <div className={`flex flex-col ${P.className ?? ""}`}>
+          <div className={`flex flex-col ${P.className ?? ""} w-full`}>
             {P.children}
           </div>
         </div>
