@@ -20,7 +20,9 @@ export function YamaLogo(P: { className?: string }) {
       }`}
     >
       <div className="me-3">محصولی از</div>
-      <Image src={yamaLogo} alt="yama logo" className="w-7 h-7" />
+      <Link href={"https://khodadadei.ir/"} target="_blank">
+        <Image src={yamaLogo} alt="yama logo" className="w-7 h-7" />
+      </Link>
     </div>
   );
 }
